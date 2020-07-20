@@ -66,7 +66,7 @@ class July2020 extends FunSuite {
     val arr =
       """26 40 83
 49 60 57
-13 89 99""".trim.split("\n").toList.map{_.split(" ").toList.map(_.toInt)}
+13 89 1""".trim.split("\n").toList.map{_.split(" ").toList.map(_.toInt)}
 
     def solve(num:Int, arr:List[List[Int]]) = {
 
@@ -102,7 +102,7 @@ class July2020 extends FunSuite {
       }
 
       for(i<- 0 until num) {
-        down(i,arr(0)(i),1)
+        down2(i,arr(0)(i),1)
       }
 
       resultList.result().min

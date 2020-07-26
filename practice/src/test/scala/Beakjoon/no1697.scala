@@ -31,6 +31,7 @@ class no1697 extends FunSuite {
 
       }
       recusive(x,0)
+      println(countList)
       println(countList.result().min)
     }
 

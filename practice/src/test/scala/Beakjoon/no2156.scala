@@ -25,6 +25,7 @@ class no2156 extends FunSuite{
       dpList += Math.max(Math.max(getDpList(i-3) + tri(i-1)+tri(i-2), getDpList(i-2) + tri(i)) , getDpList(i-1))
       max = Math.max(max,dpList(i))
     }
+    println(dpList)
     println(max)
   }
 

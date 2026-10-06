@@ -1,0 +1,14 @@
+# 촬영본·작업 파일·완성본은 GitHub에 올리지 않는다 (개인 영상 보호)
+work/
+out/
+inbox/*
+!inbox/README.md
+sfx/*
+!sfx/README.md
+style.json
+*.mp4
+*.mov
+*.m4v
+__pycache__/
+.pytest_cache/
+*.pyc

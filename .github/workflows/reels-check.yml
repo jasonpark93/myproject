@@ -1,0 +1,40 @@
+# 릴스 편집기 코드를 고칠 때마다 합성 영상으로 처음부터 끝까지 편집해 본다.
+name: 릴스 편집기 검사
+
+on:
+  pull_request:
+    paths:
+      - "reels/**"
+  push:
+    paths:
+      - "reels/**"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: reels
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: ffmpeg 설치
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: reels/requirements*.txt
+
+      - name: 패키지 설치 (음성 인식 모델은 테스트에 필요 없음)
+        run: pip install numpy Pillow opencv-python-headless pytest
+
+      - name: 테스트
+        run: python -m pytest -q

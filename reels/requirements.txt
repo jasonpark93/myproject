@@ -2,3 +2,4 @@ numpy>=1.24
 Pillow>=10.0
 opencv-python-headless>=4.8
 faster-whisper>=1.1
+edge-tts>=6.1  # 미리보기용 자연스러운 음성 (인터넷 필요)

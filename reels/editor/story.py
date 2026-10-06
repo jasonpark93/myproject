@@ -103,7 +103,7 @@ class Narration:
 def from_tts(spec: dict, engine: str | None = None, voice: str | None = None, log=print) -> Narration:
     from . import tts
 
-    engine = engine or (tts.available() or [None])[0]
+    engine = tts.pick(engine, voice, log)
     script, ranges, _ = script_of(spec)
     log(f"미리보기 음성 만드는 중… ({tts.describe(engine)})")
     pieces, words = [np.zeros(int(0.15 * SR), np.float32)], []

@@ -123,7 +123,7 @@ def test_story_render_with_fake_voice(tmp_path, monkeypatch):
     monkeypatch.setattr(motion, "OUT_DIR", tmp_path / "out")
     monkeypatch.setattr(motion, "WORK_DIR", tmp_path / "work")
     monkeypatch.setattr(motion, "BGM_DIR", tmp_path / "bgm")
-    monkeypatch.setattr(tts, "available", lambda: ["fake"])
+    monkeypatch.setattr(tts, "pick", lambda *a, **k: "fake")
 
     def fake_speak(text, engine=None, voice_name=None):
         n = max(2, len(text.split()))

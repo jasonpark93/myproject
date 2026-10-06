@@ -9,6 +9,7 @@ bgm/*
 !bgm/README.md
 style.json
 research/
+/models/
 *.mp4
 *.mov
 *.m4v

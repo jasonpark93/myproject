@@ -229,6 +229,10 @@ def render_story(ref: str, voice: str | None = None, use_tts: bool = False, engi
         raise EditorError(f"녹음 파일이 없습니다: {voice_path}")
     settings = dict(DEFAULTS)
     settings.update(spec.get("settings") or {})
+    if voice_path is None:
+        from . import tts
+
+        engine = tts.pick(engine, log=log)  # 실제로 소리 나는 음성으로 정해야 캐시가 섞이지 않는다
     key = story.narration_key(spec, voice_path, engine)
     nar_audio = work / f"narration-{key}.wav"
     nar_meta = work / f"narration-{key}.json"

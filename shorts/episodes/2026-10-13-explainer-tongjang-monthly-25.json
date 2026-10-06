@@ -1,0 +1,128 @@
+{
+  "id": "2026-10-13-explainer-tongjang-monthly-25",
+  "series": "explainer",
+  "format": "narrated",
+  "publish_at": "2026-10-13T19:00:00+09:00",
+  "topic": {
+    "id": "tongjang-monthly-25",
+    "title": "청약통장 한 달에 얼마 넣어야 할까",
+    "angle": "공공 vs 민영에 따라 정답이 다르다"
+  },
+  "script": {
+    "title": "청약통장, 한 달에 얼마 넣어야 할까?",
+    "scenes": [
+      {
+        "narration": "청약통장에 매달 얼마 넣고 계세요? 정답은 [[노리는 집]]에 따라 다릅니다.",
+        "headline": "얼마 넣어야 할까",
+        "visual": {
+          "type": "title",
+          "value": "",
+          "label": "",
+          "items": []
+        },
+        "broll": "bank savings"
+      },
+      {
+        "narration": "공공분양은 그동안 넣은 [[인정 금액]]이 많을수록 당첨에 유리합니다.",
+        "headline": "공공분양은 금액 순",
+        "visual": {
+          "type": "title",
+          "value": "",
+          "label": "",
+          "items": []
+        },
+        "broll": "apartment complex"
+      },
+      {
+        "narration": "그 인정 한도가 2024년 11월부터 한 달 10만 원에서 [[25만 원]]으로 올랐어요.",
+        "headline": "인정 한도 상향",
+        "visual": {
+          "type": "versus",
+          "value": "",
+          "label": "",
+          "items": [
+            "예전 월 10만 원",
+            "지금 월 25만 원"
+          ]
+        },
+        "broll": "calendar"
+      },
+      {
+        "narration": "반면 민영주택은 지역과 면적별로 정해진 [[예치금]]만 채우면 됩니다.",
+        "headline": "민영은 예치금 기준",
+        "visual": {
+          "type": "title",
+          "value": "",
+          "label": "",
+          "items": []
+        },
+        "broll": "city skyline"
+      },
+      {
+        "narration": "총급여 7천만 원 이하 무주택 세대주라면 연 300만 원까지 넣은 돈의 40%를 [[소득공제]]받을 수 있어요.",
+        "headline": "소득공제 혜택",
+        "visual": {
+          "type": "number",
+          "value": "최대 120만 원",
+          "label": "연 300만 원 × 40% 소득공제",
+          "items": []
+        },
+        "broll": "tax calculator"
+      },
+      {
+        "narration": "공공분양을 노린다면 월 25만 원, 민영 위주라면 예치금을 채운 뒤 [[부담 없는 금액]]으로 이어 가세요.",
+        "headline": "목표별 정리",
+        "visual": {
+          "type": "versus",
+          "value": "",
+          "label": "",
+          "items": [
+            "공공분양: 월 25만 원",
+            "민영 위주: 예치금 채우기"
+          ]
+        },
+        "broll": "planning desk"
+      },
+      {
+        "narration": "내 목표에 맞게 넣는 게 핵심입니다. 저장해 두고 통장 정리할 때 다시 보세요.",
+        "headline": "",
+        "visual": {
+          "type": "quote",
+          "value": "목표에 맞게 넣기",
+          "label": "",
+          "items": []
+        },
+        "broll": "notebook planning"
+      }
+    ],
+    "description": "공공분양은 납입 인정 금액 순으로 당첨자를 정하고, 2024년 11월부터 월 납입 인정 한도가 25만 원으로 올랐습니다. 민영주택은 지역·면적별 예치금 기준입니다. 소득공제 조건도 함께 정리했어요.",
+    "hashtags": [
+      "#청약통장",
+      "#주택청약",
+      "#내집마련",
+      "#소득공제"
+    ],
+    "sources": [
+      {
+        "title": "데일리안 - 월 납입인정액 25만원 상향 시행",
+        "url": "https://www.dailian.co.kr/news/view/1410450/"
+      },
+      {
+        "title": "뉴시스 - 청약통장 개선 (2024.9)",
+        "url": "https://www.newsis.com/view/NISX20240925_0002898404"
+      }
+    ],
+    "fact_check": [
+      "월 납입 인정액 25만 원(2024년 11월 시행)",
+      "소득공제: 총급여 7천만 원 이하 무주택 세대주, 연 300만 원 한도 40% (2026년 기준 유지 여부 확인)",
+      "민영주택 예치금은 지역·면적별로 다름"
+    ],
+    "pinned_comment": "여러분은 매달 청약통장에 얼마 넣고 계신가요?"
+  },
+  "research_notes": "2024.11.1부터 청약통장 월 납입 인정액 10만원→25만원(공공분양 당첨자 선정 시 저축총액 기준). 소득공제 한도 연 240만원→300만원, 공제율 40%(최대 120만원), 대상 총급여 7천만원 이하 무주택 세대주. 민영주택은 지역·전용면적별 예치금 충족 여부로 순위 판단.",
+  "meta": {
+    "generator": "manual",
+    "author": "초기 대본 (사람 검수 후 사용)",
+    "created_at": "2026-10-06T14:00:00+09:00"
+  }
+}

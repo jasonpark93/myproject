@@ -1,0 +1,129 @@
+{
+  "id": "2026-10-18-explainer-youth-dream-account",
+  "series": "explainer",
+  "format": "narrated",
+  "publish_at": "2026-10-18T19:00:00+09:00",
+  "topic": {
+    "id": "youth-dream-account",
+    "title": "청년주택드림 청약통장",
+    "angle": "만 34세 이하라면 갈아탈지 확인"
+  },
+  "script": {
+    "title": "청년주택드림 청약통장, 갈아타야 할까?",
+    "scenes": [
+      {
+        "narration": "만 34세 이하라면 청약통장을 [[갈아탈지]] 한번 따져 보세요.",
+        "headline": "청년 청약통장",
+        "visual": {
+          "type": "title",
+          "value": "",
+          "label": "",
+          "items": []
+        },
+        "broll": "young professional"
+      },
+      {
+        "narration": "청년주택드림 청약통장은 일반 청약통장보다 금리가 높아요. 조건을 채우면 최대 연 [[4.5%]]입니다.",
+        "headline": "최대 연 4.5%",
+        "visual": {
+          "type": "number",
+          "value": "연 4.5%",
+          "label": "최대 우대금리",
+          "items": []
+        },
+        "broll": "bank savings"
+      },
+      {
+        "narration": "가입 조건은 만 19~34세 무주택자, 직전 연도 소득 [[5천만 원]] 이하예요.",
+        "headline": "가입 조건",
+        "visual": {
+          "type": "check",
+          "value": "",
+          "label": "",
+          "items": [
+            "만 19~34세",
+            "무주택자",
+            "연소득 5천만 원 이하"
+          ]
+        },
+        "broll": "office worker"
+      },
+      {
+        "narration": "요건을 갖추면 이자소득 비과세와 연말정산 [[소득공제]] 혜택도 받을 수 있어요.",
+        "headline": "세금 혜택",
+        "visual": {
+          "type": "check",
+          "value": "",
+          "label": "",
+          "items": [
+            "이자소득 비과세",
+            "소득공제"
+          ]
+        },
+        "broll": "tax calculator"
+      },
+      {
+        "narration": "이미 청약통장이 있다면 해지하지 말고 [[전환]]이 되는지 먼저 확인하세요.",
+        "headline": "해지 말고 전환",
+        "visual": {
+          "type": "quote",
+          "value": "해지 전에 전환 확인",
+          "label": "",
+          "items": []
+        },
+        "broll": "bank counter"
+      },
+      {
+        "narration": "당첨되면 저금리 청년 대출과 연결될 수 있어서, 내 집 마련까지 이어지는 [[통장]]이에요.",
+        "headline": "당첨 후 대출 연계",
+        "visual": {
+          "type": "title",
+          "value": "",
+          "label": "",
+          "items": []
+        },
+        "broll": "new apartment keys"
+      },
+      {
+        "narration": "해당되는 친구가 있다면 이 영상을 공유해 주세요.",
+        "headline": "",
+        "visual": {
+          "type": "quote",
+          "value": "조건 되면 꼭 확인",
+          "label": "",
+          "items": []
+        },
+        "broll": "friends smartphone"
+      }
+    ],
+    "description": "청년주택드림 청약통장은 만 19~34세 무주택 청년(직전 연도 소득 5천만 원 이하)을 위한 청약통장으로, 최대 연 4.5% 우대금리와 세제 혜택, 당첨 후 대출 연계가 특징입니다. 세부 요건은 은행·정책 안내를 확인하세요.",
+    "hashtags": [
+      "#청년주택드림",
+      "#청약통장",
+      "#청년",
+      "#내집마련"
+    ],
+    "sources": [
+      {
+        "title": "대한민국 정책브리핑 - 청년주택드림 청약통장",
+        "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148966534"
+      },
+      {
+        "title": "부동산R114 - 청년 주택드림 청약통장 가입 조건",
+        "url": "https://r114.com/trends/wiki/subscription/3484a6fa-284b-8045-8242-ee99f16f3667"
+      }
+    ],
+    "fact_check": [
+      "최대 금리 연 4.5%·가입 조건(만 19~34세, 무주택, 연소득 5천만 원 이하) 2026년 기준 재확인",
+      "비과세·소득공제 세부 요건(세대주 여부 등)",
+      "기존 통장 전환 시 가입기간 인정 범위"
+    ],
+    "pinned_comment": "청년주택드림 통장, 이미 갈아타셨나요?"
+  },
+  "research_notes": "청년주택드림 청약통장: 만 19~34세(병역기간 최대 6년 제외), 무주택자, 직전년도 소득 5천만원 이하. 최대 연 4.5% 우대금리, 이자소득 비과세(한도 500만원, 무주택 세대주 등 요건), 연 300만원 한도 40% 소득공제(요건 충족 시), 당첨 시 청년주택드림 대출 연계. 기존 청약통장 전환 가능 여부 은행 확인.",
+  "meta": {
+    "generator": "manual",
+    "author": "초기 대본 (사람 검수 후 사용)",
+    "created_at": "2026-10-06T14:00:00+09:00"
+  }
+}

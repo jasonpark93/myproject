@@ -1,0 +1,45 @@
+# 매주 월요일: 채널 조회수·구독자를 모아 GitHub 이슈로 리포트를 남긴다 (YOUTUBE_API_KEY, YOUTUBE_CHANNEL_ID 필요).
+name: 쇼츠 주간 리포트
+
+on:
+  schedule:
+    - cron: "7 0 * * 1" # 매주 월요일 09:07 (한국 시간)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: shorts
+    env:
+      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+      YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: shorts/requirements*.txt
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: 리포트 작성 → 이슈 등록
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if [ -z "$YOUTUBE_API_KEY" ] || [ -z "$YOUTUBE_CHANNEL_ID" ]; then
+            echo "YOUTUBE_API_KEY / YOUTUBE_CHANNEL_ID가 없어 리포트를 건너뜁니다."
+            exit 0
+          fi
+          python -m studio report --output "$RUNNER_TEMP/report.md"
+          gh issue create --title "📊 쇼츠 주간 리포트 $(TZ=Asia/Seoul date +%F)" --body-file "$RUNNER_TEMP/report.md"

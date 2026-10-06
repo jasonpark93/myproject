@@ -1,0 +1,75 @@
+{
+  "channel": {
+    "name": "돈한입",
+    "tagline": "1분이면 돈 되는 생활경제",
+    "audience": "내 집 마련, 청약, 세금, 지원금처럼 생활 속 돈 문제에 관심 있는 20~60대 직장인과 가족",
+    "tone": "친근한 존댓말. 과장·공포 마케팅 없이 핵심만. 숫자와 날짜는 정확하게.",
+    "links": [],
+    "pexels_credit": true
+  },
+
+  "brand": {
+    "primary": "#2F6BFF",
+    "accent": "#FFD43B",
+    "bg_top": "#0B1220",
+    "bg_bottom": "#1A2C55",
+    "text": "#FFFFFF"
+  },
+
+  "voice": {
+    "provider": "google",
+    "google_voice": "ko-KR-Chirp3-HD-Charon",
+    "elevenlabs_voice_id": "",
+    "elevenlabs_model": "eleven_multilingual_v2",
+    "speed": 1.1
+  },
+
+  "writer": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "research": true,
+    "max_searches": 5
+  },
+
+  "schedule": {
+    "publish_time": "19:00",
+    "days": {
+      "mon": "cheongyak",
+      "tue": "explainer",
+      "wed": "topn",
+      "thu": "explainer",
+      "fri": "explainer",
+      "sat": "topn",
+      "sun": "explainer"
+    }
+  },
+
+  "series": {
+    "explainer": {
+      "label": "1분 돈 상식",
+      "format": "narrated",
+      "target_seconds": 40
+    },
+    "topn": {
+      "label": "알아두면 돈 되는 TOP",
+      "format": "list"
+    },
+    "cheongyak": {
+      "label": "이번 주 청약",
+      "format": "narrated",
+      "target_seconds": 35,
+      "source": "cheongyak",
+      "fallback": "explainer"
+    }
+  },
+
+  "review": "pr",
+  "upload": "manual",
+  "broll": "pexels",
+  "youtube": {
+    "category_id": "27",
+    "made_for_kids": false,
+    "contains_synthetic_media": false,
+    "default_language": "ko"
+  }
+}

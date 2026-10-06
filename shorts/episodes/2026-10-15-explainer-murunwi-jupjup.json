@@ -1,0 +1,128 @@
+{
+  "id": "2026-10-15-explainer-murunwi-jupjup",
+  "series": "explainer",
+  "format": "narrated",
+  "publish_at": "2026-10-15T19:00:00+09:00",
+  "topic": {
+    "id": "murunwi-jupjup",
+    "title": "무순위 청약(줍줍) 자격",
+    "angle": "이제 아무나 못 넣는다"
+  },
+  "script": {
+    "title": "줍줍 청약, 이제 아무나 못 넣는다?",
+    "scenes": [
+      {
+        "narration": "로또 청약이라 불리는 [[줍줍]], 아직도 아무나 넣을 수 있을까요?",
+        "headline": "줍줍 청약 자격",
+        "visual": {
+          "type": "title",
+          "value": "",
+          "label": "",
+          "items": []
+        },
+        "broll": "apartment building"
+      },
+      {
+        "narration": "줍줍은 무순위 청약이에요. 계약 포기나 부적격으로 남은 집을 [[다시 추첨]]하는 겁니다.",
+        "headline": "무순위 청약이란",
+        "visual": {
+          "type": "quote",
+          "value": "남은 집을 다시 추첨",
+          "label": "",
+          "items": []
+        },
+        "broll": "lottery"
+      },
+      {
+        "narration": "한동안은 집이 있어도, 어디에 살아도 넣을 수 있어서 [[경쟁]]이 엄청났죠.",
+        "headline": "예전엔 누구나",
+        "visual": {
+          "type": "title",
+          "value": "",
+          "label": "",
+          "items": []
+        },
+        "broll": "crowd city"
+      },
+      {
+        "narration": "하지만 정부가 제도를 바꿔 이제는 [[무주택자]] 중심으로 공급합니다.",
+        "headline": "이제는 무주택자",
+        "visual": {
+          "type": "versus",
+          "value": "",
+          "label": "",
+          "items": [
+            "예전: 누구나",
+            "지금: 무주택자 중심"
+          ]
+        },
+        "broll": "government building"
+      },
+      {
+        "narration": "거주지역 조건은 지자체가 단지마다 정할 수 있어서 [[공고문]]을 꼭 확인해야 해요.",
+        "headline": "거주 요건은 공고마다",
+        "visual": {
+          "type": "title",
+          "value": "",
+          "label": "",
+          "items": []
+        },
+        "broll": "documents reading"
+      },
+      {
+        "narration": "당첨되면 계약금이 바로 필요하니 [[자금 계획]]부터 세우고 넣으세요.",
+        "headline": "자금 계획 먼저",
+        "visual": {
+          "type": "check",
+          "value": "",
+          "label": "",
+          "items": [
+            "계약금 바로 필요",
+            "대출 가능 여부 확인",
+            "거주의무 확인"
+          ]
+        },
+        "broll": "calculator money"
+      },
+      {
+        "narration": "구독해 두면 새 청약 소식을 빠르게 받아볼 수 있어요.",
+        "headline": "",
+        "visual": {
+          "type": "quote",
+          "value": "공고문이 정답",
+          "label": "",
+          "items": []
+        },
+        "broll": "smartphone notification"
+      }
+    ],
+    "description": "무순위 청약(줍줍)은 계약 포기·부적격으로 남은 물량을 다시 추첨하는 제도입니다. 2025년 제도 개편으로 무주택자 중심으로 바뀌었고, 거주지역 요건은 지자체가 단지별로 정할 수 있어요.",
+    "hashtags": [
+      "#무순위청약",
+      "#줍줍",
+      "#청약",
+      "#내집마련"
+    ],
+    "sources": [
+      {
+        "title": "KB Think - 국토교통부 무순위 청약 개편 (2025.2)",
+        "url": "https://kbthink.com/main/real-estate/government-policy/molit-press/2025/molit-press-250211.html"
+      },
+      {
+        "title": "뉴시스 - 무순위 청약제도 종합 개편 예고",
+        "url": "https://mobile.newsis.com/view/NISX20250207_0003057474"
+      }
+    ],
+    "fact_check": [
+      "무순위 청약 무주택 요건의 실제 시행 시점(2025년 주택공급규칙 개정) 재확인",
+      "단지별 거주지역 요건은 해당 모집공고문 기준"
+    ],
+    "pinned_comment": "줍줍 청약, 넣어 본 적 있으신가요?"
+  },
+  "research_notes": "국토부 2025.2.11 발표: 무순위 청약 신청 자격을 무주택자로 제한, 거주지역 요건은 시장·군수·구청장이 지역 여건에 따라 부과 여부 결정, 위장전입 방지 강화. 주택공급규칙 개정 후 2025년 상반기 시행 예정이었음.",
+  "meta": {
+    "generator": "manual",
+    "author": "초기 대본 (사람 검수 후 사용)",
+    "created_at": "2026-10-06T14:00:00+09:00"
+  }
+}

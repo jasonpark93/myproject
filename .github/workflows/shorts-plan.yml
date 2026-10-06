@@ -1,0 +1,82 @@
+# 매주 일요일: Claude가 다음 7일치 쇼츠 대본을 쓰고(웹 검색으로 사실 확인), 검수용 PR을 연다.
+# PR을 머지하면 shorts-render.yml이 영상을 만든다. 설정 방법은 shorts/README.md 참고.
+name: 쇼츠 대본 만들기
+
+on:
+  schedule:
+    - cron: "7 1 * * 0" # 매주 일요일 10:07 (한국 시간)
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "며칠치 대본을 만들까요?"
+        default: "7"
+      start:
+        description: "시작 날짜 YYYY-MM-DD (비우면 내일부터)"
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write # 자동 모드에서 렌더 워크플로를 실행
+
+concurrency:
+  group: shorts-plan
+  cancel-in-progress: false
+
+env:
+  GIT_AUTHOR_NAME: github-actions[bot]
+  GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+  GIT_COMMITTER_NAME: github-actions[bot]
+  GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: |
+            shorts/requirements*.txt
+            cheongyak/requirements*.txt
+
+      - name: 패키지 설치
+        run: pip install -r shorts/requirements.txt -r cheongyak/requirements.txt
+
+      - name: 청약 데이터 준비 (월요일 '이번 주 청약' 편에 사용)
+        working-directory: cheongyak
+        run: |
+          bash scripts/data-branch.sh restore || echo "::warning::저장된 청약 데이터를 불러오지 못했습니다"
+          if [ -z "$DATA_GO_KR_API_KEY" ]; then
+            echo "DATA_GO_KR_API_KEY가 없어 새 공고는 받지 않습니다 (청약 편은 다른 주제로 대체될 수 있음)."
+          elif python -m app update; then
+            bash scripts/data-branch.sh save || echo "::warning::데이터 브랜치 저장 실패(다음 실행 때 다시 시도)"
+          else
+            echo "::warning::청약 데이터 수집 실패 — 청약 편은 다른 주제로 대체됩니다"
+          fi
+
+      - name: 대본 생성 (Claude + 웹 검색)
+        working-directory: shorts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
+          DAYS: ${{ inputs.days || '7' }}
+          START: ${{ inputs.start }}
+        run: |
+          ARGS=(--days "$DAYS" --review-file "$RUNNER_TEMP/review.md")
+          if [ -n "$START" ]; then ARGS+=(--start "$START"); fi
+          python -m studio plan "${ARGS[@]}"
+
+      - name: 검수 요청 PR 열기 (또는 자동 반영)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          REVIEW_FILE: ${{ runner.temp }}/review.md
+        run: bash shorts/scripts/open-review.sh

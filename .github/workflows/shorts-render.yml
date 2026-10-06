@@ -1,0 +1,61 @@
+# 대본이 master에 들어오면(PR 머지) 곧 공개될 쇼츠를 렌더해 GitHub Release에 올린다.
+# channel.json의 upload가 "api"면 유튜브에 예약 업로드까지 한다 (YouTube API 감사 통과 후).
+name: 쇼츠 영상 만들기
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "shorts/episodes/**"
+      - "shorts/channel.json"
+      - "shorts/studio/**"
+      - "shorts/assets/**"
+  schedule:
+    - cron: "37 23 * * *" # 매일 08:37 (한국 시간) — 다가오는 영상을 미리 준비
+  workflow_dispatch:
+
+permissions:
+  contents: write # 릴리스(영상 보관함) 만들기
+
+concurrency:
+  group: shorts-render
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: shorts
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: ffmpeg·한글 폰트 설치
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg fonts-noto-cjk
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: shorts/requirements*.txt
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: 대본 검사
+        run: python -m studio check
+
+      - name: 렌더 → GitHub Release (+ 유튜브 예약 업로드)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: python -m studio publish

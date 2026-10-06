@@ -1,0 +1,124 @@
+{
+  "id": "2026-10-16-explainer-winning-money-plan",
+  "series": "explainer",
+  "format": "narrated",
+  "publish_at": "2026-10-16T19:00:00+09:00",
+  "topic": {
+    "id": "winning-money-plan",
+    "title": "청약 당첨 후 필요한 돈",
+    "angle": "당첨되면 언제 얼마가 필요할까"
+  },
+  "script": {
+    "title": "청약 당첨되면 돈은 언제 얼마 필요할까?",
+    "scenes": [
+      {
+        "narration": "청약에 당첨되면 돈은 [[언제]], 얼마나 필요할까요?",
+        "headline": "당첨 후 필요한 돈",
+        "visual": {
+          "type": "title",
+          "value": "",
+          "label": "",
+          "items": []
+        },
+        "broll": "money calculator"
+      },
+      {
+        "narration": "분양 대금은 보통 계약금, 중도금, 잔금 [[세 번]]에 나눠 냅니다.",
+        "headline": "세 번에 나눠서",
+        "visual": {
+          "type": "list",
+          "value": "",
+          "label": "",
+          "items": [
+            "계약금",
+            "중도금",
+            "잔금"
+          ]
+        },
+        "broll": "calendar planning"
+      },
+      {
+        "narration": "계약금은 보통 분양가의 10~20%예요. 당첨 후 계약할 때 [[현금]]으로 준비해야 합니다.",
+        "headline": "계약금 10~20%",
+        "visual": {
+          "type": "number",
+          "value": "10~20%",
+          "label": "계약할 때 현금으로",
+          "items": []
+        },
+        "broll": "cash money"
+      },
+      {
+        "narration": "중도금은 약 60%로, 공사 기간 동안 나눠 내고 대부분 [[중도금 대출]]을 이용해요.",
+        "headline": "중도금 약 60%",
+        "visual": {
+          "type": "number",
+          "value": "약 60%",
+          "label": "공사 중 나눠 납부",
+          "items": []
+        },
+        "broll": "construction site"
+      },
+      {
+        "narration": "잔금은 나머지 20~30%를 입주할 때 냅니다. 이때 [[주택담보대출]]로 바꾸는 경우가 많아요.",
+        "headline": "잔금 20~30%",
+        "visual": {
+          "type": "number",
+          "value": "20~30%",
+          "label": "입주할 때",
+          "items": []
+        },
+        "broll": "new apartment keys"
+      },
+      {
+        "narration": "다만 비율과 대출 조건은 [[단지마다]] 달라요. 거주의무가 있으면 전세로 돌리기도 어렵습니다.",
+        "headline": "단지마다 달라요",
+        "visual": {
+          "type": "check",
+          "value": "",
+          "label": "",
+          "items": [
+            "납부 비율",
+            "중도금 대출 조건",
+            "거주의무 여부"
+          ]
+        },
+        "broll": "documents reading"
+      },
+      {
+        "narration": "청약 전에 계약금부터 모아 두세요. 저장해 두면 계획 세울 때 도움이 됩니다.",
+        "headline": "",
+        "visual": {
+          "type": "quote",
+          "value": "계약금이 첫 관문",
+          "label": "",
+          "items": []
+        },
+        "broll": "savings jar"
+      }
+    ],
+    "description": "청약 당첨 후 분양 대금은 보통 계약금(10~20%), 중도금(약 60%), 잔금(20~30%)으로 나눠 냅니다. 납부 비율과 대출 조건은 단지마다 다르니 모집공고문을 꼭 확인하세요.",
+    "hashtags": [
+      "#청약당첨",
+      "#분양",
+      "#내집마련",
+      "#자금계획"
+    ],
+    "sources": [
+      {
+        "title": "청약홈 (한국부동산원)",
+        "url": "https://www.applyhome.co.kr"
+      }
+    ],
+    "fact_check": [
+      "계약금·중도금·잔금 비율은 일반적인 예시 — 단지별 공고문 기준임을 유지"
+    ],
+    "pinned_comment": "계약금, 미리 얼마나 모아 두셨나요?"
+  },
+  "research_notes": "일반적인 분양 대금 구조: 계약금 10~20%, 중도금 약 60%(통상 수회 분납, 집단대출), 잔금 20~30%(입주 시). 실제 비율·대출 조건·거주의무는 단지별 모집공고문 기준.",
+  "meta": {
+    "generator": "manual",
+    "author": "초기 대본 (사람 검수 후 사용)",
+    "created_at": "2026-10-06T14:00:00+09:00"
+  }
+}

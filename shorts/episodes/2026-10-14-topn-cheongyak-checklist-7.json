@@ -1,0 +1,67 @@
+{
+  "id": "2026-10-14-topn-cheongyak-checklist-7",
+  "series": "topn",
+  "format": "list",
+  "publish_at": "2026-10-14T19:00:00+09:00",
+  "topic": {
+    "id": "cheongyak-checklist-7",
+    "title": "청약 넣기 전 꼭 확인할 것",
+    "angle": "저장용 체크리스트"
+  },
+  "script": {
+    "title": "청약 넣기 전 꼭 확인할 것 7가지",
+    "list_title": "청약 넣기 전 꼭 확인할 것 TOP 7",
+    "subtitle": "저장해두고 하나씩 체크하세요",
+    "items": [
+      {
+        "text": "모집공고문 자격 조건",
+        "detail": "거주지역·소득·자산 기준"
+      },
+      {
+        "text": "내 청약통장 순위",
+        "detail": "청약홈에서 바로 확인"
+      },
+      {
+        "text": "거주의무·전매제한",
+        "detail": "단지마다 달라요"
+      },
+      {
+        "text": "재당첨 제한 여부",
+        "detail": "과거 당첨 이력 확인"
+      },
+      {
+        "text": "계약금 준비",
+        "detail": "보통 분양가의 10~20%"
+      },
+      {
+        "text": "중도금 대출 가능 여부",
+        "detail": "분양가·규제 지역 확인"
+      },
+      {
+        "text": "가점 정확히 계산하기",
+        "detail": "틀리면 부적격 당첨"
+      }
+    ],
+    "description": "청약 신청 전에 놓치기 쉬운 7가지를 정리했습니다. 정확한 조건은 각 단지의 입주자모집공고문과 청약홈에서 확인하세요.",
+    "hashtags": [
+      "#청약",
+      "#청약꿀팁",
+      "#내집마련",
+      "#아파트청약"
+    ],
+    "sources": [
+      {
+        "title": "청약홈 (한국부동산원)",
+        "url": "https://www.applyhome.co.kr"
+      }
+    ],
+    "fact_check": [],
+    "pinned_comment": "청약 넣을 때 가장 헷갈리는 건 뭔가요?"
+  },
+  "research_notes": "일반 원칙 체크리스트 (단지별 조건은 모집공고문 기준).",
+  "meta": {
+    "generator": "manual",
+    "author": "초기 대본 (사람 검수 후 사용)",
+    "created_at": "2026-10-06T14:00:00+09:00"
+  }
+}

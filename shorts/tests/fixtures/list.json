@@ -1,0 +1,26 @@
+{
+  "id": "2099-01-06-topn-sample",
+  "series": "topn",
+  "format": "list",
+  "publish_at": "2099-01-06T19:00:00+09:00",
+  "topic": {"id": "sample-list", "title": "테스트용 리스트"},
+  "script": {
+    "title": "청약 넣기 전 꼭 확인할 것 7가지",
+    "list_title": "청약 넣기 전 꼭 확인할 것 TOP 7",
+    "subtitle": "저장해두고 하나씩 체크하세요",
+    "items": [
+      {"text": "모집공고문 자격 조건", "detail": "지역·소득·자산 기준"},
+      {"text": "거주의무·전매제한", "detail": "단지마다 다름"},
+      {"text": "재당첨 제한 여부", "detail": "당첨 이력 확인"},
+      {"text": "계약금 마련 계획", "detail": "보통 분양가의 10~20%"},
+      {"text": "중도금 대출 가능 여부", "detail": ""},
+      {"text": "특별공급 중복 신청 규칙", "detail": "공고문 확인"},
+      {"text": "청약통장 순위·예치금", "detail": "청약홈에서 확인"}
+    ],
+    "description": "청약 전에 놓치기 쉬운 체크리스트입니다.",
+    "hashtags": ["#청약", "#청약꿀팁"],
+    "sources": [],
+    "fact_check": [],
+    "pinned_comment": ""
+  }
+}

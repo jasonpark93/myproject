@@ -1,0 +1,22 @@
+{
+  "id": "2099-01-05-explainer-sample",
+  "series": "explainer",
+  "format": "narrated",
+  "publish_at": "2099-01-05T19:00:00+09:00",
+  "topic": {"id": "sample", "title": "테스트용 샘플"},
+  "script": {
+    "title": "청약 가점 84점, 이렇게 계산합니다",
+    "scenes": [
+      {"narration": "청약 가점, [[84점 만점]]이라는 거 알고 계셨나요?", "headline": "청약 가점 계산법", "visual": {"type": "number", "value": "84점", "label": "민영주택 가점제 만점", "items": []}, "broll": "apartment"},
+      {"narration": "점수는 [[세 가지]]를 더해서 정해집니다.", "headline": "딱 세 가지", "visual": {"type": "check", "value": "", "label": "", "items": ["무주택기간 32점", "부양가족 수 35점", "통장 가입기간 17점"]}, "broll": "calculator"},
+      {"narration": "무주택기간은 1년마다 2점씩, 15년이면 [[32점]]이에요.", "headline": "무주택기간", "visual": {"type": "number", "value": "최대 32점", "label": "1년마다 2점", "items": []}, "broll": ""},
+      {"narration": "본인 통장과 배우자 통장, 어느 쪽이 유리할까요?", "headline": "통장 가입기간", "visual": {"type": "versus", "value": "", "label": "", "items": ["본인 통장 최대 17점", "배우자 통장 최대 3점"]}, "broll": ""},
+      {"narration": "내 점수가 궁금하면 [[구독]]하고 다음 영상도 확인하세요.", "headline": "", "visual": {"type": "quote", "value": "점수를 알면 전략이 보입니다", "label": "", "items": []}, "broll": ""}
+    ],
+    "description": "청약 가점 계산법을 1분으로 정리했습니다.",
+    "hashtags": ["#청약", "#청약가점", "#내집마련"],
+    "sources": [{"title": "주택공급에 관한 규칙 별표1", "url": "https://www.law.go.kr/"}],
+    "fact_check": [],
+    "pinned_comment": ""
+  }
+}

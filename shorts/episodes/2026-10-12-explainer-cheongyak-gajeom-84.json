@@ -1,0 +1,127 @@
+{
+  "id": "2026-10-12-explainer-cheongyak-gajeom-84",
+  "series": "explainer",
+  "format": "narrated",
+  "publish_at": "2026-10-12T19:00:00+09:00",
+  "topic": {
+    "id": "cheongyak-gajeom-84",
+    "title": "청약 가점 84점 계산법",
+    "angle": "84점 만점 숫자로 시작"
+  },
+  "script": {
+    "title": "청약 가점 84점, 1분 만에 계산하는 법",
+    "scenes": [
+      {
+        "narration": "청약 가점은 [[84점]] 만점입니다. 내 점수, 1분 만에 계산해 볼까요?",
+        "headline": "청약 가점 계산법",
+        "visual": {
+          "type": "number",
+          "value": "84점",
+          "label": "민영주택 가점제 만점",
+          "items": []
+        },
+        "broll": "apartment building"
+      },
+      {
+        "narration": "점수는 딱 세 가지로 정해집니다. 무주택기간, 부양가족 수, 청약통장 가입기간이에요.",
+        "headline": "점수는 딱 3가지",
+        "visual": {
+          "type": "check",
+          "value": "",
+          "label": "",
+          "items": [
+            "무주택기간 32점",
+            "부양가족 수 35점",
+            "통장 가입기간 17점"
+          ]
+        },
+        "broll": "calculator money"
+      },
+      {
+        "narration": "무주택기간은 1년 미만이 2점이고, 1년마다 2점씩 올라 15년 이상이면 [[32점]]입니다.",
+        "headline": "무주택기간",
+        "visual": {
+          "type": "number",
+          "value": "최대 32점",
+          "label": "1년마다 2점씩",
+          "items": []
+        },
+        "broll": "city apartment"
+      },
+      {
+        "narration": "부양가족은 0명이 5점, 한 명 늘 때마다 5점씩 더해 6명 이상이면 [[35점]]이에요.",
+        "headline": "부양가족 수",
+        "visual": {
+          "type": "number",
+          "value": "최대 35점",
+          "label": "1명마다 5점씩",
+          "items": []
+        },
+        "broll": "family home"
+      },
+      {
+        "narration": "청약통장은 가입 15년 이상이면 [[17점]]으로, 이 항목의 최고점입니다.",
+        "headline": "통장 가입기간",
+        "visual": {
+          "type": "number",
+          "value": "최대 17점",
+          "label": "6개월 미만 1점부터",
+          "items": []
+        },
+        "broll": "bank savings"
+      },
+      {
+        "narration": "2024년 3월부터는 배우자 통장 기간으로 [[최대 3점]]을 더할 수 있어요. 다만 합쳐도 17점까지입니다.",
+        "headline": "배우자 통장 합산",
+        "visual": {
+          "type": "versus",
+          "value": "",
+          "label": "",
+          "items": [
+            "본인 통장 최대 17점",
+            "배우자 통장 최대 3점"
+          ]
+        },
+        "broll": "couple planning"
+      },
+      {
+        "narration": "청약 넣기 전에 내 점수부터 정확히 계산해 보세요. 저장해 두면 나중에 바로 찾을 수 있어요.",
+        "headline": "",
+        "visual": {
+          "type": "quote",
+          "value": "청약 전에 내 점수부터",
+          "label": "",
+          "items": []
+        },
+        "broll": "notebook planning"
+      }
+    ],
+    "description": "민영주택 청약 가점제는 무주택기간(32점), 부양가족 수(35점), 청약통장 가입기간(17점)을 더한 84점 만점입니다. 2024년 3월 25일부터는 배우자 통장 가입기간도 최대 3점까지 합산됩니다.",
+    "hashtags": [
+      "#청약",
+      "#청약가점",
+      "#내집마련",
+      "#청약통장"
+    ],
+    "sources": [
+      {
+        "title": "청약홈 (한국부동산원)",
+        "url": "https://www.applyhome.co.kr"
+      },
+      {
+        "title": "뉴데일리 - 배우자 청약통장 가점제 신설 (2024.3)",
+        "url": "https://biz.newdaily.co.kr/site/data/html/2024/03/24/2024032400024.html"
+      }
+    ],
+    "fact_check": [
+      "배우자 통장 가점(최대 3점, 합산 17점 한도)은 2024년 3월 25일 이후 공고부터 적용"
+    ],
+    "pinned_comment": "여러분의 청약 가점은 몇 점인가요? 댓글로 남겨 주세요!"
+  },
+  "research_notes": "주택공급에 관한 규칙 별표1: 무주택기간 최대 32점(1년 미만 2점, 1년마다 +2), 부양가족 0명 5점~6명 이상 35점, 입주자저축 가입기간 6개월 미만 1점~15년 이상 17점. 2024.3.25 개정: 배우자 통장 가입기간 점수 50%(1년 미만 1점, 1~2년 2점, 2년 이상 3점) 합산, 통장 항목 합계 최대 17점.",
+  "meta": {
+    "generator": "manual",
+    "author": "초기 대본 (사람 검수 후 사용)",
+    "created_at": "2026-10-06T14:00:00+09:00"
+  }
+}

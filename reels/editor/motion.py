@@ -281,7 +281,12 @@ def render_story(ref: str, voice: str | None = None, use_tts: bool = False, engi
     snaps = snapshots(out_path, nar.duration, work / "snapshots")
     sheet = scene_sheet(out_path, timings, work / "snapshots" / "scenes.jpg")
     loud = audio.measure_loudness(out_path)
+    upload = story.upload_text(spec)
+    if upload:
+        write_text(work / "upload.md", upload)
     report = write_report(work, spec, nar, timings, caps, events, out_path, snaps, sheet, loud, bgm_name, origin)
+    if upload:
+        report += f"\n업로드 문구(제목·설명·해시태그): `{work / 'upload.md'}`\n"
     log(f"완성: {out_path}")
     log("")
     log(report)

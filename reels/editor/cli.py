@@ -14,6 +14,7 @@
   review 이름                       검토표 다시 만들기
   list                              작업 목록
   story 이름 [--voice 녹음.m4a]       모션그래픽 릴스 (stories/이름.json: 대본 + 카드)
+  similar 이름 참고대본.txt          참고 영상과 대본이 얼마나 겹치는지 (표절 방지)
   ref 영상                          참고 영상(잘 된 릴스) 분석
   sounds                            효과음 미리듣기 파일 만들기
   doctor                            설치 상태 점검
@@ -358,6 +359,9 @@ def main(argv=None) -> int:
     sub.add_parser("list")
     sub.add_parser("sounds")
     sub.add_parser("doctor")
+    p_sim = sub.add_parser("similar", help="스토리 대본이 참고 영상 대본과 얼마나 겹치는지")
+    p_sim.add_argument("name", help="stories/이름.json")
+    p_sim.add_argument("reference", help="참고 영상 대본(txt)")
     p_ref = sub.add_parser("ref", help="참고 영상 분석")
     p_ref.add_argument("video")
     p_story = sub.add_parser("story", help="모션그래픽 릴스 (목소리 + 카드)")
@@ -403,6 +407,15 @@ def main(argv=None) -> int:
             from .motion import render_story
 
             render_story(args.name, args.voice, args.tts, args.engine, args.out, args.model, log=log)
+        elif args.cmd == "similar":
+            from . import story
+
+            spec = story.load(story.find(args.name))
+            ref_text = Path(args.reference).expanduser().read_text(encoding="utf-8")
+            result = story.similarity(spec, ref_text)
+            log(f"겹침 {result['ratio'] * 100:.0f}% · 10자 이상 똑같은 구절 {len(result['phrases'])}개 → {result['verdict']}")
+            for phrase in result["phrases"][:10]:
+                log(f"  - {phrase}")
         elif args.cmd == "ref":
             from .reference import analyze_reference
 

@@ -117,7 +117,8 @@ def test_story_render_with_fake_voice(tmp_path, monkeypatch):
 
     stories = tmp_path / "stories"
     stories.mkdir()
-    (stories / "t.json").write_text(json.dumps(SPEC, ensure_ascii=False), encoding="utf-8")
+    spec = dict(SPEC, upload={"titles": ["청약 꿀팁"], "description": "설명", "hashtags": ["#쇼츠"]})
+    (stories / "t.json").write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
     monkeypatch.setattr(story, "STORIES", stories)
     monkeypatch.setattr(motion, "OUT_DIR", tmp_path / "out")
     monkeypatch.setattr(motion, "WORK_DIR", tmp_path / "work")
@@ -139,6 +140,7 @@ def test_story_render_with_fake_voice(tmp_path, monkeypatch):
     assert info["scenes"] == 2 and info["captions"] >= 3
     assert abs(info["loudness"] - (-14.0)) < 1.5
     assert (tmp_path / "work" / "story-t" / "snapshots" / "scenes.jpg").exists()
+    assert "★ 청약 꿀팁" in (tmp_path / "work" / "story-t" / "upload.md").read_text(encoding="utf-8")
 
 
 @needs_ffmpeg
@@ -160,3 +162,21 @@ def test_recording_removes_ng_and_aligns(tmp_path, monkeypatch):
     assert nar.stats["ng"] == 2
     assert [w["w"] for w in nar.words][:3] == ["청약통장", "하나로", "3천만"]  # 대본 글자로 교정
     assert nar.duration < 7.0
+
+
+def test_similarity_flags_copied_script():
+    copied = "청약통장 하나로 3천만 원 아끼는 법. 줌인, 효과음, 자막까지 넣어 줍니다."
+    fresh = "오늘은 전세 사기 피하는 체크리스트 세 가지를 알려드릴게요."
+    assert story.similarity(SPEC, copied)["ratio"] > 0.9
+    assert "너무 비슷" in story.similarity(SPEC, copied)["verdict"]
+    result = story.similarity(SPEC, fresh)
+    assert result["ratio"] < 0.3 and not result["phrases"]
+
+
+def test_upload_text():
+    spec = dict(SPEC, upload={"titles": ["짧은 제목", "가" * 45, "세 번째"], "pick": 2, "description": "설명입니다", "hashtags": ["쇼츠", "#청약", "내 집 마련"]})
+    text = story.upload_text(spec)
+    assert "3. ★ 세 번째" in text
+    assert "40자 넘음" in text
+    assert "#쇼츠 #청약 #내집마련" in text
+    assert story.upload_text(SPEC) is None

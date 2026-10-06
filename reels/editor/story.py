@@ -271,3 +271,46 @@ def narration_key(spec: dict, voice_path: Path | None, engine: str | None) -> st
     script, _, _ = script_of(spec)
     src = {"voice": str(voice_path), "hash": file_hash(voice_path)} if voice_path else {"tts": engine}
     return stable_hash(script, src, "nar1")
+
+
+# ---------- 업로드 문구 ----------
+def upload_text(spec: dict) -> str | None:
+    """stories JSON의 upload → 업로드할 때 복사해 쓰는 문구 (제목 3개 중 추천 1개, 설명, 해시태그 5개)."""
+    up = spec.get("upload")
+    if not up:
+        return None
+    titles = [str(t).strip() for t in up.get("titles") or [] if str(t).strip()][:3]
+    pick = int(up.get("pick", 0)) if titles else 0
+    pick = min(max(pick, 0), max(0, len(titles) - 1))
+    tags = []
+    for tag in up.get("hashtags") or []:
+        tag = str(tag).strip().replace(" ", "")
+        if tag:
+            tags.append(tag if tag.startswith("#") else f"#{tag}")
+    lines = [f"# 업로드 문구 — {spec.get('name', '')}", "", "## 제목 (★ 추천)"]
+    for i, t in enumerate(titles):
+        warn = "  ← 40자 넘음, 잘릴 수 있음" if len(t) > 40 else ""
+        lines.append(f"{i + 1}. {'★ ' if i == pick else ''}{t}{warn}")
+    lines += ["", "## 설명", "", str(up.get("description", "")).strip(), "", "## 해시태그", "", " ".join(tags[:5]), ""]
+    return "\n".join(lines)
+
+
+# ---------- 참고 영상과 얼마나 비슷한지 ----------
+def similarity(spec: dict, reference: str, min_run: int = 10) -> dict:
+    """우리 대본과 참고 영상 대본의 겹침. 구조는 따라 해도 문장은 새로 써야 한다(그대로 쓰면 표절·중복 콘텐츠 위험)."""
+    from difflib import SequenceMatcher
+
+    script, _, _ = script_of(spec)
+    a, b = norm(script), norm(reference)
+    if not a or not b:
+        return {"ratio": 0.0, "phrases": [], "verdict": "비교할 글자가 없습니다."}
+    sm = SequenceMatcher(None, a, b, autojunk=False)
+    phrases = [a[blk.a : blk.a + blk.size] for blk in sm.get_matching_blocks() if blk.size >= min_run]
+    ratio = sm.ratio()
+    if ratio >= 0.5 or len(phrases) >= 3:
+        verdict = "너무 비슷합니다. 소재·문장·예시를 바꿔 다시 쓰세요."
+    elif ratio >= 0.3 or phrases:
+        verdict = "조금 겹칩니다. 똑같은 구절은 다른 표현으로 바꾸는 게 안전합니다."
+    else:
+        verdict = "괜찮습니다. 구조만 참고하고 문장은 새로 썼습니다."
+    return {"ratio": round(ratio, 3), "phrases": phrases, "verdict": verdict}

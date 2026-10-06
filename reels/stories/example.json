@@ -1,59 +1,223 @@
 {
-  "header": {"label": "요즘 해외에서 난리난", "title": "클로드 영상 자동편집"},
+  "header": {
+    "label": "요즘 해외에서 난리난",
+    "title": "클로드 영상 자동편집"
+  },
   "scenes": [
     {
       "say": "릴스 편집, 이제 직접 할 필요 없습니다.",
-      "card": {"type": "bigtext", "lines": ["릴스 편집", "[[직접 안 해요]]"], "at": ["릴스", "직접"], "size": 200},
+      "card": {
+        "type": "bigtext",
+        "lines": [
+          "릴스 편집",
+          "[[직접 안 해요]]"
+        ],
+        "at": [
+          "릴스",
+          "직접"
+        ],
+        "size": 200
+      },
       "pills": [
-        {"text": "컷 편집", "icon": "cut", "pos": "tl", "at": "이제"},
-        {"text": "자막", "icon": "caption", "pos": "tr", "at": "직접"},
-        {"text": "효과음", "icon": "sound", "pos": "bl", "at": "필요"},
-        {"text": "줌인", "icon": "zoom", "pos": "br", "at": "없습니다"}
+        {
+          "text": "컷 편집",
+          "icon": "cut",
+          "pos": "tl",
+          "at": "이제"
+        },
+        {
+          "text": "자막",
+          "icon": "caption",
+          "pos": "tr",
+          "at": "직접"
+        },
+        {
+          "text": "효과음",
+          "icon": "sound",
+          "pos": "bl",
+          "at": "필요"
+        },
+        {
+          "text": "줌인",
+          "icon": "zoom",
+          "pos": "br",
+          "at": "없습니다"
+        }
       ]
     },
     {
       "say": "지금 보고 계신 이 영상도 [[클로드]]가 처음부터 끝까지 편집했어요.",
-      "card": {"type": "stat", "label": "클로드 편집 중", "value": 100, "unit": "%", "at": "처음부터", "count": 1.4, "sub": "✔ 편집 완료"}
+      "card": {
+        "type": "stat",
+        "label": "클로드 편집 중",
+        "value": 100,
+        "unit": "%",
+        "at": "처음부터",
+        "count": 1.4,
+        "sub": "✔ 편집 완료"
+      }
     },
     {
       "say": "방법도 [[진짜 간단]]해요.",
-      "card": {"type": "bigtext", "lines": ["방법도", "[[진짜 간단]]"], "pill": "딱 1단계면 끝", "at": ["방법도", "진짜"]}
+      "card": {
+        "type": "bigtext",
+        "lines": [
+          "방법도",
+          "[[진짜 간단]]"
+        ],
+        "pill": "딱 1단계면 끝",
+        "at": [
+          "방법도",
+          "진짜"
+        ]
+      }
     },
     {
       "say": "찍어 둔 원본 영상을 클로드에 올리기만 하면 끝입니다.",
-      "card": {"type": "steps", "title": "딱 이것만", "icon": "bolt", "steps": [{"text": "폰으로 찍기", "at": "찍어"}, {"text": "원본 올리기", "at": "올리기만"}, {"text": "끝!", "at": "끝입니다"}]},
-      "stamp": {"text": "끝!", "at": "끝입니다", "size": 260}
+      "card": {
+        "type": "steps",
+        "title": "딱 이것만",
+        "icon": "bolt",
+        "steps": [
+          {
+            "text": "폰으로 찍기",
+            "at": "찍어"
+          },
+          {
+            "text": "원본 올리기",
+            "at": "올리기만"
+          },
+          {
+            "text": "끝!",
+            "at": "끝입니다"
+          }
+        ]
+      },
+      "stamp": {
+        "text": "끝!",
+        "at": "끝입니다",
+        "size": 260
+      }
     },
     {
       "say": "그러면 클로드가 [[줌인]], [[효과음]], 자막까지 알아서 넣어 줍니다.",
-      "card": {"type": "checklist", "title": "클로드가 알아서 넣어줌", "items": [
-        {"text": "줌인", "icon": "zoom", "at": "줌인"},
-        {"text": "효과음", "icon": "sound", "at": "효과음"},
-        {"text": "자막", "icon": "caption", "at": "자막"},
-        {"text": "템포 조절", "icon": "bolt", "at": "알아서"}
-      ]}
+      "card": {
+        "type": "checklist",
+        "title": "클로드가 알아서 넣어줌",
+        "items": [
+          {
+            "text": "줌인",
+            "icon": "zoom",
+            "at": "줌인"
+          },
+          {
+            "text": "효과음",
+            "icon": "sound",
+            "at": "효과음"
+          },
+          {
+            "text": "자막",
+            "icon": "caption",
+            "at": "자막"
+          },
+          {
+            "text": "템포 조절",
+            "icon": "bolt",
+            "at": "알아서"
+          }
+        ]
+      }
     },
     {
       "say": "말하다 [[틀린 부분]], 어색한 공백, '음' 같은 소리도 전부 잘라 줍니다.",
-      "card": {"type": "waveform", "title": "내 목소리 원본", "marks": [
-        {"label": "틀린 부분", "at": "틀린"}, {"label": "공백", "at": "공백"}, {"label": "'음...'", "at": "같은"}
-      ], "cut_at": "잘라"}
+      "card": {
+        "type": "waveform",
+        "title": "내 목소리 원본",
+        "marks": [
+          {
+            "label": "틀린 부분",
+            "at": "틀린"
+          },
+          {
+            "label": "공백",
+            "at": "공백"
+          },
+          {
+            "label": "'음...'",
+            "at": "같은"
+          }
+        ],
+        "cut_at": "잘라"
+      }
     },
     {
       "say": "편집 시간이 [[확 줄어드니까]]",
-      "card": {"type": "compare", "title": "편집 시간", "icon": "clock", "bars": [
-        {"label": "직접 편집", "value": 1.0, "color": "red", "at": "편집"},
-        {"label": "클로드", "value": 0.2, "color": "lime", "at": "확"}
-      ], "result": "확 줄어듦 ↓", "result_at": "줄어드니까"}
+      "card": {
+        "type": "compare",
+        "title": "편집 시간",
+        "icon": "clock",
+        "bars": [
+          {
+            "label": "직접 편집",
+            "value": 1.0,
+            "color": "red",
+            "at": "편집"
+          },
+          {
+            "label": "클로드",
+            "value": 0.2,
+            "color": "lime",
+            "at": "확"
+          }
+        ],
+        "result": "확 줄어듦 ↓",
+        "result_at": "줄어드니까"
+      }
     },
     {
       "say": "[[매일 꾸준히]] 올릴 수 있습니다.",
-      "card": {"type": "calendar", "title": "매일 꾸준히 업로드", "at": "매일", "step": 0.16}
+      "card": {
+        "type": "calendar",
+        "title": "매일 꾸준히 업로드",
+        "at": "매일",
+        "step": 0.16
+      }
     },
     {
       "say": "댓글에 '클로드' 남기시면 제가 실제로 쓰는 [[편집 세팅]]이랑 사용 방법까지 보내 드릴게요.",
-      "card": {"type": "comment", "keyword": "클로드", "type_at": "남기시면", "dm": "플랫폼트리님이 자료를 보냈어요", "dm_at": "실제로",
-               "items": [{"text": "실제 편집 세팅", "at": "세팅"}, {"text": "사용 방법 가이드", "at": "사용"}]}
+      "card": {
+        "type": "comment",
+        "keyword": "클로드",
+        "type_at": "남기시면",
+        "dm": "자료가 도착했어요",
+        "dm_at": "실제로",
+        "items": [
+          {
+            "text": "실제 편집 세팅",
+            "at": "세팅"
+          },
+          {
+            "text": "사용 방법 가이드",
+            "at": "사용"
+          }
+        ]
+      }
     }
-  ]
+  ],
+  "upload": {
+    "titles": [
+      "릴스 편집, 이제 직접 안 해도 됩니다 (클로드 자동편집)",
+      "원본만 올리면 컷·자막·효과음 끝! 클로드 영상 자동편집",
+      "편집 시간 확 줄이는 법 | 클로드로 릴스 자동 편집"
+    ],
+    "pick": 1,
+    "description": "찍어 둔 원본만 올리면 컷 편집, 줌인, 효과음, 자막까지 자동으로.\n편집 시간이 줄어드니 매일 꾸준히 올릴 수 있어요.\n\n※ 사용 방법은 댓글로 '클로드'를 남겨 주세요.",
+    "hashtags": [
+      "#쇼츠",
+      "#릴스편집",
+      "#영상편집",
+      "#클로드",
+      "#자동화"
+    ]
+  }
 }

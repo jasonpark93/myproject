@@ -1,4 +1,10 @@
-"""모션그래픽 릴스 렌더: 배경 + 상단 고정 제목 + 장면 카드 + 자막 + 목소리·효과음(+배경음악)."""
+"""모션그래픽 릴스 렌더: 배경 + 상단 고정 제목 + 장면 카드 + 자막 + 목소리·효과음(+배경음악).
+
+화면 꾸미기(Look)는 테마마다 다르다:
+- NoteLook(기본): 모눈 노트 배경 · 채널 이름표 + 제목 형광펜 · 장면 진행 막대 · 종이 카드(그림자·테이프·살짝 기울임)
+  · 카드가 오른쪽에서 밀려 들어오고 왼쪽으로 빠짐 · 먹색 라벨 자막
+- NeonLook: 참고 릴스와 비슷한 검정 배경 · 가운데 제목 · 흐림 전환 · 흰 글씨 자막
+"""
 
 from __future__ import annotations
 
@@ -16,9 +22,11 @@ OUT_DIR = ROOT / "out"
 WORK_DIR = ROOT / "work"
 BGM_DIR = ROOT / "bgm"
 CARD_CY = 830  # 카드 중심 높이
+NOTE_CARD_CY = 872  # 노트 테마는 위 제목 영역이 조금 더 크다
 CARD_MAX = (980, 820)
 CAPTION_BOTTOM = 0.27  # 참고 릴스와 같은 높이 (화면 아래에서 27%)
-PIPELINE = "m2"  # 카드·렌더 방식이 바뀌면 올린다 (예전 영상 캐시 무효화)
+PIPELINE = "m3"  # 카드·렌더 방식이 바뀌면 올린다 (예전 영상 캐시 무효화)
+TILTS = (-1.2, 0.9, -0.7, 1.1)  # 종이 카드 기울기 (장면마다 돌아가며)
 
 
 def background(th: dict) -> np.ndarray:
@@ -33,6 +41,30 @@ def background(th: dict) -> np.ndarray:
     img += low * np.array([70, 50, 140], np.float32) * 0.10
     vig = 1 - 0.35 * (((xx - W / 2) / (W * 0.75)) ** 2 + ((yy - H / 2) / (H * 0.7)) ** 2)
     img *= np.clip(vig, 0.55, 1)[..., None]
+    return np.ascontiguousarray(img[..., ::-1]).clip(0, 255).astype(np.uint8)  # BGR
+
+
+def note_background(th: dict) -> np.ndarray:
+    """모눈 노트: 따뜻한 종이색 + 옅은 모눈 + 왼쪽 스프링 구멍 + 종이 결 + 가장자리 살짝 어둡게."""
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    top, bottom = np.array(th["bg_top"], np.float32), np.array(th["bg_bottom"], np.float32)
+    f = (yy / H)[..., None]
+    img = top * (1 - f) + bottom * f
+    grid = np.array(th.get("grid", (226, 216, 192)), np.float32)
+    cell = 54
+    gx = (xx - 6) % cell < 2
+    gy = (yy - 10) % cell < 2
+    line = (gx | gy).astype(np.float32)[..., None] * 0.55
+    img = img * (1 - line) + grid * line
+    rng = np.random.default_rng(3)
+    img += rng.normal(0, 2.2, (H, W, 1)).astype(np.float32)  # 종이 결
+    for y in range(330, H - 200, 96):  # 스프링 노트 구멍
+        sub = img[y - 16 : y + 17, 10:43]
+        d = (xx[y - 16 : y + 17, 10:43] - 26) ** 2 + (yy[y - 16 : y + 17, 10:43] - y) ** 2
+        sub[d < 15**2] *= 0.93
+        sub[d < 12**2] = (212, 202, 182)
+    vig = 1 - 0.10 * (((xx - W / 2) / (W * 0.62)) ** 2 + ((yy - H / 2) / (H * 0.62)) ** 2)
+    img *= np.clip(vig, 0.86, 1)[..., None]
     return np.ascontiguousarray(img[..., ::-1]).clip(0, 255).astype(np.uint8)  # BGR
 
 
@@ -87,12 +119,16 @@ def _fit(img: cards.Img) -> float:
 
 
 def build_scenes(spec: dict, th: dict, timings: list, base_dir: Path):
+    from .notecards import Stickers
+
     out = []
     for sc, tm in zip(spec["scenes"], timings):
         card = cards.make_card(sc.get("card") or {"type": "text", "title": cards.plain(sc["say"])[:20]}, th, tm, base_dir)
         extras = []
         if sc.get("pills"):
             extras.append(cards.Pills(sc["pills"], th, tm))
+        if sc.get("stickers"):
+            extras.append(Stickers(sc["stickers"], th, tm))
         if sc.get("stamp"):
             extras.append(cards.Stamp(sc["stamp"] if isinstance(sc["stamp"], dict) else {"text": str(sc["stamp"])}, th, tm))
         out.append((card, extras, tm))
@@ -112,60 +148,281 @@ def sfx_plan(scenes: list, max_per_10s: int) -> list:
     return sfx_mod.thin(events, max_per_10s, min_gap=0.35)
 
 
+class Look:
+    """테마별 화면 꾸미기의 공통 부분: 장면 번호 따라가기 · 자막 그리기."""
+
+    def __init__(self, spec: dict, th: dict, scenes: list, caps: list):
+        self.spec, self.th, self.scenes = spec, th, scenes
+        self.k = 0
+        self.cap_i = 0
+        self.sprites = [self.caption_sprite(c) for c in caps]
+        self.shows = [(int(round(c["show"][0] * FPS)), int(round(c["show"][1] * FPS))) for c in caps]
+        self.bg = self.background()
+
+    def background(self) -> np.ndarray:
+        return background(self.th)
+
+    def caption_sprite(self, cap: dict):
+        ccfg = {"size": 1.1, "center_y": H * (1 - CAPTION_BOTTOM), "highlight": "#%02X%02X%02X" % self.th["accent"], "max_width": 900}
+        return graphics.caption_sprite(cap["text"], cap["hl"], ccfg)
+
+    def advance(self, t: float) -> bool:
+        changed = False
+        while self.k + 1 < len(self.scenes) and t >= self.scenes[self.k + 1][2].start - 1e-9:
+            self.leave(t)
+            self.k += 1
+            changed = True
+        return changed
+
+    def leave(self, t: float) -> None:
+        pass
+
+    def captions(self, frame: np.ndarray, j: int) -> None:
+        while self.cap_i < len(self.shows) and self.shows[self.cap_i][1] <= j:
+            self.cap_i += 1
+        for c in range(self.cap_i, min(self.cap_i + 2, len(self.shows))):
+            a_, b_ = self.shows[c]
+            if a_ <= j < b_:
+                self.sprites[c].draw(frame, j - a_)
+
+
+class NeonLook(Look):
+    """참고 릴스 스타일: 가운데 제목, 흐림 전환."""
+
+    def __init__(self, spec, th, scenes, caps):
+        super().__init__(spec, th, scenes, caps)
+        self.lab, self.title = header_images(spec, th)
+        self.prev_img = None
+
+    def leave(self, t):
+        card, _, tm = self.scenes[self.k]
+        self.prev_img = card.frame(max(0.0, t - tm.start))
+
+    def frame(self, j: int) -> np.ndarray:
+        t = j / FPS
+        self.advance(t)
+        k = self.k
+        frame = self.bg.copy()
+        # 상단 제목 (처음에만 톡 튀어나옴)
+        s, a = cards.pop(t, 0.3, 0.85)
+        for img, cy in ((self.lab, 150), (self.title, 258)):
+            if img is not None:
+                im = img.scaled(s) if s != 1.0 else img
+                put_u8(frame, im, (W - im.w) / 2, cy - im.h / 2, a)
+        card, extras, tm = self.scenes[k]
+        local = t - tm.start
+        img = card.frame(local)
+        fit = _fit(img)
+        # 이전 카드는 흐려지며 사라지고, 새 카드는 흐림에서 또렷하게 커지며 등장
+        if self.prev_img is not None and local < 0.25 and k > 0:
+            q = local / 0.25
+            old = self.prev_img.scaled(_fit(self.prev_img)).blurred(2 + 14 * q)
+            put_u8(frame, old, (W - old.w) / 2, CARD_CY - old.h / 2, 1 - q)
+        if k > 0 and local < 0.3:
+            q = cards.ease_out_back(local / 0.3, 1.2)
+            blur = 10 * (1 - min(1.0, local / 0.2))
+            scale = fit * (0.92 + 0.08 * q)
+            im = img.scaled(scale)
+            im = im.blurred(blur) if blur > 0.5 else im
+            put_u8(frame, im, (W - im.w) / 2, CARD_CY - im.h / 2, min(1.0, local / 0.15))
+        else:
+            im = img.scaled(fit) if fit != 1.0 else img
+            put_u8(frame, im, (W - im.w) / 2, CARD_CY - im.h / 2)
+        box_w, box_h = img.w * fit, img.h * fit
+        target = FrameTarget(frame)
+        for extra in extras:
+            extra.draw(target, ((W - box_w) / 2, CARD_CY - box_h / 2, box_w, box_h), local)
+        self.captions(frame, j)
+        return frame
+
+
+class NoteHeader:
+    """노트 테마 상단: [채널 이름표][회차 꼬리표] / 제목(형광펜이 쓱) / 장면 진행 막대."""
+
+    X = 64
+
+    def __init__(self, spec: dict, th: dict, timings: list):
+        self.th = th
+        head = spec.get("header") or {}
+        brand = spec.get("brand", head.get("brand"))
+        tag = head.get("tag") or head.get("label")
+        chips = []
+        if brand:
+            txt = cards.text(brand, 38, th, weight="black", fill=th.get("pill_text", (255, 255, 255)))
+            coin = cards.sticker(spec.get("brand_sticker", "coin"), 46, outline=0, shadow=0)
+            w = txt.w + 36 + (coin.w - 10 if coin else 0)
+            h = 70
+            c = cards.Canvas(w, h)
+            c.put(cards.rounded(w, h, h / 2, th["pill"]), 0, 0)
+            x = 18
+            if coin:
+                c.put(coin, x - 8, (h - coin.h) / 2)
+                x += coin.w - 18
+            c.put(txt, x, (h - txt.h) / 2)
+            chips.append(c.img())
+        if tag:
+            txt = cards.text(tag, 34, th, weight="extrabold")
+            w, h = txt.w + 30, 70
+            c = cards.Canvas(w, h)
+            c.put(cards.rounded(w, h, h / 2, th["card"], border=th["text"], bw=3), 0, 0)
+            c.put(txt, (w - txt.w) / 2, (h - txt.h) / 2)
+            chips.append(c.img())
+        self.chips = chips
+        self.chip_y = 132
+        self.title_raw = head.get("title")
+        self.title_size = int(head.get("size", 94))
+        self._title = {}
+        self.title_y = self.chip_y + (84 if chips else 0)
+        first = self.title_img(0.0)
+        self.bar_y = self.title_y + (first.h - 12 if first else 0) + 10
+        self.progress = head.get("progress", True)
+        self.starts = [tm.start for tm in timings]
+        self.ends = [tm.end for tm in timings]
+        n = len(timings)
+        gap = 10
+        self.seg_w = (W - self.X * 2 - gap * (n - 1)) / max(1, n)
+        self.gap = gap
+        self.track = cards.rounded(max(4, int(self.seg_w)), 10, 5, th.get("dim", (182, 172, 154)), alpha=0.45)
+        self.full = cards.rounded(max(4, int(self.seg_w)), 10, 5, th["accent"])
+
+    def title_img(self, p: float):
+        if not self.title_raw:
+            return None
+        p = round(cards.clamp01(p), 2)
+        if p not in self._title:
+            self._title[p] = cards.text(self.title_raw, self.title_size, self.th, weight="black", mark="highlight", marker=p,
+                                        max_w=W - self.X * 2 + 30, align="left")
+        return self._title[p]
+
+    def bottom(self) -> float:
+        return self.bar_y + 10
+
+    def draw(self, frame: np.ndarray, t: float, k: int) -> None:
+        x = self.X - 4
+        s, a = cards.pop(t + 0.15, 0.3, 0.85)  # 첫 화면(표지)부터 보이게
+        for chip in self.chips:
+            im = chip.scaled(s) if s != 1.0 else chip
+            put_u8(frame, im, x + (chip.w - im.w) / 2, self.chip_y + (chip.h - im.h) / 2, a)
+            x += chip.w + 12
+        title = self.title_img((t - 0.25) / 0.5)
+        if title is not None:
+            put_u8(frame, title, self.X - 16, self.title_y)
+        if self.progress and len(self.starts) > 1:
+            for i in range(len(self.starts)):
+                x0 = self.X + i * (self.seg_w + self.gap)
+                put_u8(frame, self.track, x0, self.bar_y)
+                if i < k:
+                    put_u8(frame, self.full, x0, self.bar_y)
+                elif i == k:
+                    f = cards.clamp01((t - self.starts[i]) / max(0.1, self.ends[i] - self.starts[i]))
+                    w = int(self.seg_w * f)
+                    if w >= 10:
+                        put_u8(frame, cards.Img(self.full.pm[:, :w], self.full.a[:, :w]), x0, self.bar_y)
+
+
+class NoteLook(Look):
+    """노트 테마: 종이 카드(그림자·테이프·기울임), 옆으로 밀려 들어오는 전환, 먹색 라벨 자막."""
+
+    ENTER = 0.34
+    EXIT = 0.24
+
+    def __init__(self, spec, th, scenes, caps):
+        super().__init__(spec, th, scenes, caps)
+        self.header = NoteHeader(spec, th, [tm for _, _, tm in scenes])
+        self.card_cy = max(NOTE_CARD_CY, self.header.bottom() + 40 + CARD_MAX[1] / 2) if self.header.title_raw else NOTE_CARD_CY
+        self.tilts = [TILTS[i % len(TILTS)] if card.paper else 0.0 for i, (card, _, _) in enumerate(scenes)]
+        self._sheet = {}
+        self._decor = {}
+        self.prev = None
+        self.last = None
+
+    def background(self):
+        return note_background(self.th)
+
+    def caption_sprite(self, cap):
+        cfg = {"size": 1.0, "center_y": H * (1 - CAPTION_BOTTOM), "highlight": "#%02X%02X%02X" % tuple(self.th["highlight"]), "max_width": 960,
+               "bg": tuple(self.th["pill"])}
+        return graphics.pill_caption_sprite(cap["text"], cap["hl"], cfg)
+
+    def leave(self, t):
+        self.prev = self.last
+
+    def sheet(self, k: int, img: cards.Img, angle: float) -> cards.Img:
+        """종이 카드면 그림자와 테이프를 붙이고 기울인다. 카드 그림이 그대로면 지난번 결과를 다시 쓴다."""
+        cached = self._sheet.get(k)
+        ang = round(angle, 1)
+        if cached and cached[0] is img and cached[1] == ang:
+            return cached[2]
+        card = self.scenes[k][0]
+        if card.paper:
+            if k not in self._decor:
+                shadow, pad = cards.soft_shadow(img.w, img.h, r=card.paper_radius, blur=16, alpha=0.24)
+                tp = cards.tape(190, 50, angle=(-5, 4, -3)[k % 3], seed=k + 1)
+                self._decor[k] = (shadow, pad, tp)
+            shadow, pad, tp = self._decor[k]
+            c = cards.Canvas(img.w + pad * 2, img.h + pad * 2)
+            c.put(shadow, 0, 12)
+            c.put(img, pad, pad)
+            c.put(tp, pad + img.w / 2 - tp.w / 2, pad - tp.h / 2 + 6)
+            out = c.img()
+        else:
+            out = img
+        if abs(ang) >= 0.1:
+            out = out.rotated(ang)
+        self._sheet[k] = (img, ang, out)
+        return out
+
+    def frame(self, j: int) -> np.ndarray:
+        t = j / FPS
+        self.advance(t)
+        k = self.k
+        frame = self.bg.copy()
+        self.header.draw(frame, t, k)
+        card, extras, tm = self.scenes[k]
+        local = t - tm.start
+        img = card.frame(local)
+        fit = _fit(img)
+        if k > 0 and self.prev is not None and local < self.EXIT:  # 이전 카드는 왼쪽으로 빠지며 사라짐
+            q = cards.clamp01(local / self.EXIT)
+            pim, px, py = self.prev
+            put_u8(frame, pim, px - (q**1.4) * 900, py + q * 30, (1 - q) ** 1.5)
+        angle = self.tilts[k]
+        dx = 0.0
+        alpha = 1.0
+        if k > 0 and local < self.ENTER:  # 새 카드는 오른쪽에서 밀려 들어오며 제자리에 놓인다
+            q = cards.ease_out_cubic(local / self.ENTER)
+            dx = (1 - q) * 760
+            angle += (1 - q) * 7
+            alpha = cards.clamp01(local / 0.1)
+        sx, sy = card.shake(local)
+        sheet = self.sheet(k, img, angle)
+        im = sheet.scaled(fit) if abs(fit - 1.0) > 1e-3 else sheet
+        x = (W - im.w) / 2 + dx + sx
+        y = self.card_cy - im.h / 2 + sy
+        put_u8(frame, im, x, y, alpha)
+        self.last = (im, x, y)
+        box_w, box_h = img.w * fit, img.h * fit
+        bx = (W - box_w) / 2 + dx + sx
+        by = self.card_cy - box_h / 2 + sy
+        target = FrameTarget(frame)
+        for extra in extras:
+            extra.draw(target, (bx, by, box_w, box_h), local)
+        self.captions(frame, j)
+        return frame
+
+
+def make_look(spec: dict, th: dict, scenes: list, caps: list) -> Look:
+    return NoteLook(spec, th, scenes, caps) if th.get("kind") == "note" else NeonLook(spec, th, scenes, caps)
+
+
 def render_video(spec: dict, th: dict, scenes: list, caps: list, duration: float, out: Path, log=print) -> None:
     n = int(round(duration * FPS))
-    bg = background(th)
-    lab, title = header_images(spec, th)
-    ccfg = {"size": 1.1, "center_y": H * (1 - CAPTION_BOTTOM), "highlight": "#%02X%02X%02X" % th["accent"], "max_width": 900}
-    sprites = [graphics.caption_sprite(c["text"], c["hl"], ccfg) for c in caps]
-    shows = [(int(round(c["show"][0] * FPS)), int(round(c["show"][1] * FPS))) for c in caps]
+    look = make_look(spec, th, scenes, caps)
     enc = _encoder(out, 18, "fast")
     t0 = time.time()
-    k = 0
-    cap_i = 0
-    prev_img = None
     try:
         for j in range(n):
-            t = j / FPS
-            while k + 1 < len(scenes) and t >= scenes[k + 1][2].start - 1e-9:
-                prev_img = scenes[k][0].frame(max(0.0, t - scenes[k][2].start))
-                k += 1
-            frame = bg.copy()
-            # 상단 제목 (처음에만 톡 튀어나옴)
-            s, a = cards.pop(t, 0.3, 0.85)
-            for img, cy in ((lab, 150), (title, 258)):
-                if img is not None:
-                    im = img.scaled(s) if s != 1.0 else img
-                    put_u8(frame, im, (W - im.w) / 2, cy - im.h / 2, a)
-            card, extras, tm = scenes[k]
-            local = t - tm.start
-            img = card.frame(local)
-            fit = _fit(img)
-            # 이전 카드는 흐려지며 사라지고, 새 카드는 흐림에서 또렷하게 커지며 등장
-            if prev_img is not None and local < 0.25 and k > 0:
-                q = local / 0.25
-                old = prev_img.scaled(_fit(prev_img)).blurred(2 + 14 * q)
-                put_u8(frame, old, (W - old.w) / 2, CARD_CY - old.h / 2, 1 - q)
-            if k > 0 and local < 0.3:
-                q = cards.ease_out_back(local / 0.3, 1.2)
-                blur = 10 * (1 - min(1.0, local / 0.2))
-                scale = fit * (0.92 + 0.08 * q)
-                im = img.scaled(scale)
-                im = im.blurred(blur) if blur > 0.5 else im
-                put_u8(frame, im, (W - im.w) / 2, CARD_CY - im.h / 2, min(1.0, local / 0.15))
-            else:
-                im = img.scaled(fit) if fit != 1.0 else img
-                put_u8(frame, im, (W - im.w) / 2, CARD_CY - im.h / 2)
-            box_w, box_h = img.w * fit, img.h * fit
-            target = FrameTarget(frame)
-            for extra in extras:
-                extra.draw(target, ((W - box_w) / 2, CARD_CY - box_h / 2, box_w, box_h), local)
-            while cap_i < len(shows) and shows[cap_i][1] <= j:
-                cap_i += 1
-            for c in range(cap_i, min(cap_i + 2, len(shows))):
-                a_, b_ = shows[c]
-                if a_ <= j < b_:
-                    sprites[c].draw(frame, j - a_)
+            frame = look.frame(j)
             enc.stdin.write(frame.tobytes())
             if j and j % (FPS * 10) == 0:
                 log(f"  영상 {j / FPS:.0f}/{duration:.0f}초 ({j / max(1e-6, time.time() - t0):.0f}fps)")
@@ -213,7 +470,7 @@ def render_story(ref: str, voice: str | None = None, use_tts: bool = False, engi
     path = story.find(ref)
     spec = story.load(path)
     name = spec["name"]
-    th = cards.theme(spec.get("theme", "neon"))
+    th = cards.theme(spec.get("theme"))
     work = WORK_DIR / f"story-{name}"
     work.mkdir(parents=True, exist_ok=True)
     voice_path = None

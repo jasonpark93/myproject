@@ -1,4 +1,6 @@
-"""모션그래픽 카드: 참고 릴스 스타일(검정 배경 · 형광 연두 강조 · 둥근 카드)을 코드로 그린다.
+"""모션그래픽 카드를 코드로 그린다. 테마 두 가지:
+- note(기본, 채널 고유 디자인): 모눈 노트 위에 형광펜·빨간 펜·포스트잇·다꾸 스티커
+- neon: 참고 릴스와 비슷한 검정 배경 + 형광 연두 (비교·예시용)
 
 카드는 미리 그린 조각(글자·도형·아이콘)을 프레임마다 위치·크기·투명도만 바꿔 합성해서 빠르다.
 모든 애니메이션 시각은 대본의 단어(at)에 맞춰진다.
@@ -19,30 +21,48 @@ from .util import EditorError
 SS = 3  # 도형 가장자리를 부드럽게 그리기 위한 확대 배율
 
 THEMES = {
+    # 참고 릴스와 비슷한 어두운 네온 스타일 (비교·예시용)
     "neon": {
-        "bg_top": (12, 14, 10),
-        "bg_bottom": (10, 10, 15),
-        "glow": (150, 255, 70),
-        "accent": (166, 255, 77),
-        "accent_dark": (12, 38, 6),
-        "card": (20, 20, 21),
-        "card_border": (44, 44, 46),
-        "card_border_accent": (104, 160, 46),
-        "text": (255, 255, 255),
-        "muted": (120, 120, 124),
-        "dim": (78, 78, 82),
-        "track": (30, 30, 32),
-        "red": (255, 82, 82),
-        "cream": (243, 240, 234),
-        "ink": (34, 34, 34),
-        "orange": (217, 119, 87),
+        "kind": "neon", "mark": "color", "hero": "glow", "card_style": "dark",
+        "bg_top": (12, 14, 10), "bg_bottom": (10, 10, 15), "glow": (150, 255, 70),
+        "accent": (166, 255, 77), "accent_dark": (12, 38, 6), "on_accent": (12, 12, 12),
+        "highlight": (166, 255, 77), "pen": (255, 82, 82), "good": (166, 255, 77), "bad": (255, 82, 82),
+        "card": (20, 20, 21), "card_border": (44, 44, 46), "card_border_accent": (104, 160, 46),
+        "text": (255, 255, 255), "body": (220, 220, 224), "muted": (120, 120, 124), "dim": (78, 78, 82),
+        "track": (30, 30, 32), "red": (255, 82, 82), "cream": (243, 240, 234), "ink": (34, 34, 34), "orange": (217, 119, 87),
+        "cell": (26, 26, 28), "cell_border": (46, 46, 50), "cell_on": (26, 30, 22),
+        "panel": (22, 22, 24), "panel_border": (48, 48, 52), "input": (28, 28, 30), "input_border": (56, 56, 60),
+        "pill": (31, 31, 33), "pill_border": (62, 62, 66), "pill_text": (255, 255, 255),
+        "icon": (240, 240, 240), "bar": (235, 235, 235), "mark_fill": (120, 20, 20), "spark": (235, 245, 230),
+        "stamp_fill": (16, 30, 10), "stamp_ring": (166, 255, 77), "stamp_text": (166, 255, 77),
+    },
+    # 돈한입 노트: 종이 노트 + 형광펜 + 빨간 펜 + 포스트잇 (채널 고유 디자인)
+    "note": {
+        "kind": "note", "mark": "highlight", "hero": "ink", "card_style": "paper",
+        "paper": (247, 241, 227), "grid": (226, 216, 192), "margin": (234, 160, 150),
+        "bg_top": (247, 241, 227), "bg_bottom": (243, 236, 220), "glow": (255, 224, 71),
+        "accent": (255, 116, 32), "accent_dark": (120, 50, 0), "on_accent": (255, 255, 255),
+        "highlight": (255, 222, 64), "pen": (226, 60, 66), "good": (16, 160, 140), "bad": (226, 60, 66),
+        "card": (255, 253, 247), "card_border": (226, 216, 196), "card_border_accent": (40, 36, 30),
+        "text": (28, 26, 23), "body": (60, 55, 48), "muted": (128, 118, 102), "dim": (182, 172, 154),
+        "track": (236, 228, 210), "red": (226, 60, 66), "cream": (255, 243, 168), "ink": (28, 26, 23), "orange": (255, 116, 32),
+        "cell": (250, 246, 236), "cell_border": (222, 212, 190), "cell_on": (255, 246, 214),
+        "panel": (255, 255, 255), "panel_border": (226, 216, 196), "input": (246, 242, 233), "input_border": (226, 216, 196),
+        "pill": (28, 26, 23), "pill_border": (28, 26, 23), "pill_text": (255, 255, 255),
+        "icon": (40, 37, 33), "bar": (60, 56, 50), "mark_fill": (226, 60, 66), "spark": (226, 60, 66),
+        "stamp_fill": (255, 253, 247), "stamp_ring": (226, 60, 66), "stamp_text": (226, 60, 66),
+        "sticky": {"yellow": (255, 240, 150), "mint": (200, 240, 222), "pink": (255, 214, 220), "blue": (212, 230, 255), "white": (255, 253, 247)},
     },
 }
-NAMED = {"red": "red", "lime": "accent", "accent": "accent", "orange": "orange", "gray": "dim", "grey": "dim"}
+NAMED = {
+    "red": "red", "lime": "accent", "accent": "accent", "orange": "orange", "gray": "dim", "grey": "dim",
+    "good": "good", "bad": "bad", "pen": "pen", "highlight": "highlight", "ink": "text", "icon": "icon", "muted": "muted",
+}
+DEFAULT_THEME = "note"
 
 
-def theme(name: str = "neon") -> dict:
-    return THEMES.get(name, THEMES["neon"])
+def theme(name: str | None = None) -> dict:
+    return THEMES.get(name or DEFAULT_THEME, THEMES[DEFAULT_THEME])
 
 
 def col(th: dict, value, default="accent") -> tuple:
@@ -129,9 +149,11 @@ class Img:
             nw, nh = int(h * sin + w * cos) + 2, int(h * cos + w * sin) + 2
             m[0, 2] += nw / 2 - w / 2
             m[1, 2] += nh / 2 - h / 2
-            pm = cv2.warpAffine(self.pm, m, (nw, nh), flags=cv2.INTER_LINEAR)
-            a = cv2.warpAffine(self.a, m, (nw, nh), flags=cv2.INTER_LINEAR)
-            self._cache[key] = Img(pm, a.reshape(nh, nw, 1))
+            pm = cv2.warpAffine(self.pm, m, (nw, nh), flags=cv2.INTER_CUBIC)  # 글자가 덜 뭉개지게
+            a = np.clip(cv2.warpAffine(self.a, m, (nw, nh), flags=cv2.INTER_CUBIC), 0, 1).reshape(nh, nw, 1)
+            pm = np.clip(pm, 0, None)
+            np.minimum(pm, a * 255.0, out=pm)
+            self._cache[key] = Img(pm, a)
         return self._cache[key]
 
 
@@ -237,10 +259,21 @@ def plain(text: str) -> str:
     return _MARK.sub(lambda m: m.group(1), text)
 
 
+def _marker(draw: ImageDraw.ImageDraw, x0: float, y0: float, x1: float, y1: float, rgba: tuple, seed: int) -> None:
+    """손으로 그은 형광펜: 위아래 가장자리가 살짝 울퉁불퉁한 띠."""
+    rng = np.random.default_rng(seed)
+    n = max(4, int((x1 - x0) / 40))
+    top = [(x0 + (x1 - x0) * i / n, y0 + rng.uniform(-2.5, 2.5)) for i in range(n + 1)]
+    bottom = [(x1 - (x1 - x0) * i / n, y1 + rng.uniform(-2.5, 2.5)) for i in range(n + 1)]
+    draw.polygon([(x0 - 6, y0 + 4)] + top + [(x1 + 6, (y0 + y1) / 2)] + bottom + [(x0 - 8, y1 - 3)], fill=rgba)
+
+
 def text(txt: str, size: int, th: dict, weight: str = "extrabold", fill=None, accent=None, stroke: int = 0, stroke_fill=None,
          glow=None, glow_r: int = 0, glow_a: float = 0.45, shadow: float = 0.0, max_w: int | None = None, line_gap: float = 0.08,
-         align: str = "center") -> Img:
-    """여러 줄 글자. [[ ]] 부분은 accent 색. 테두리를 먼저 다 그리고 글자를 위에 그려 겹침을 막는다."""
+         align: str = "center", mark: str | None = None, marker: float = 1.0) -> Img:
+    """여러 줄 글자. [[ ]] 부분은 테마에 따라 색을 바꾸거나(color) 형광펜으로 칠한다(highlight).
+    테두리를 먼저 다 그리고 글자를 위에 그려 겹침을 막는다. marker: 형광펜이 칠해진 비율(0~1, 애니메이션용)."""
+    mark = mark or th.get("mark", "color")
     fill = tuple(fill or th["text"])
     accent = tuple(accent or th["accent"])
     stroke_fill = tuple(stroke_fill or (0, 0, 0))
@@ -251,27 +284,39 @@ def text(txt: str, size: int, th: dict, weight: str = "extrabold", fill=None, ac
         size = max(int(size * 0.5), int(size * max_w / max(widths)))
         fnt = weight_font(size, weight)
         widths = [sum(fnt.getlength(t) for t, _ in ln) for ln in lines]
-        stroke = int(round(stroke * size / max(1, size)))
     ascent, descent = fnt.getmetrics()
     line_h = ascent + descent
     gap = int(line_h * line_gap)
-    pad = stroke + glow_r * 2 + int(shadow * 10) + 6
+    pad = stroke + glow_r * 2 + int(shadow * 10) + 14
     w = int(max(widths or [1])) + pad * 2
     h = line_h * len(lines) + gap * (len(lines) - 1) + pad * 2
+    marker_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     stroke_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     fill_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    ds, df = ImageDraw.Draw(stroke_layer), ImageDraw.Draw(fill_layer)
+    dm, ds, df = ImageDraw.Draw(marker_layer), ImageDraw.Draw(stroke_layer), ImageDraw.Draw(fill_layer)
+    spans = []
     for n, ln in enumerate(lines):
-        if align == "left":
-            x = pad
-        else:
-            x = pad + (w - pad * 2 - widths[n]) / 2
+        x = pad if align == "left" else pad + (w - pad * 2 - widths[n]) / 2
         y = pad + n * (line_h + gap)
         for t, hl in ln:
+            tw = fnt.getlength(t)
+            if hl and mark == "highlight":
+                spans.append((x, y, tw))
             if stroke:
                 ds.text((x, y), t, font=fnt, fill=stroke_fill + (255,), stroke_width=stroke, stroke_fill=stroke_fill + (255,))
-            df.text((x, y), t, font=fnt, fill=(accent if hl else fill) + (255,))
-            x += fnt.getlength(t)
+            color_ = accent if (hl and mark == "color") else fill
+            df.text((x, y), t, font=fnt, fill=color_ + (255,))
+            x += tw
+    if spans and marker > 0:  # 형광펜은 왼쪽부터 차례로 칠해진다
+        total = sum(sw for _, _, sw in spans)
+        left = total * clamp01(marker)
+        hl_rgba = tuple(th.get("highlight", accent)) + (235,)
+        for i, (sx, sy, sw) in enumerate(spans):
+            if left <= 0:
+                break
+            part = min(sw, left)
+            left -= part
+            _marker(dm, sx - 4, sy + line_h * 0.36, sx + part + 4, sy + line_h * 0.94, hl_rgba, seed=i + size)
     base = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     shape = Image.alpha_composite(stroke_layer, fill_layer) if stroke else fill_layer
     if glow is not None and glow_r > 0:
@@ -285,14 +330,73 @@ def text(txt: str, size: int, th: dict, weight: str = "extrabold", fill=None, ac
         layer.putalpha(a.point(lambda v: int(v * shadow)))
         layer = layer.transform((w, h), Image.AFFINE, (1, 0, 0, 0, 1, -max(2, int(size * 0.04))))
         base = Image.alpha_composite(base, layer)
+    base = Image.alpha_composite(base, marker_layer)
     if stroke:
         base = Image.alpha_composite(base, stroke_layer)
     base = Image.alpha_composite(base, fill_layer)
     return Img.from_pil(base)
 
 
-def hero(txt: str, size: int, th: dict, max_w: int = 960) -> Img:
-    """형광 연두 큰 글씨 (짙은 초록 테두리 + 번짐)."""
+def hand(txt: str, size: int, color: tuple, max_w: int | None = None, bold: float = 0.025) -> Img:
+    """손글씨(나눔손글씨 펜) 메모: '← 시간만이 채워줘요' 같은 펜 글씨. bold: 획을 굵게(글자 크기 대비)."""
+    from PIL import ImageFont
+
+    from . import ROOT
+
+    path = ROOT / "fonts" / "NanumPenScript-Regular.ttf"
+    fnt = ImageFont.truetype(str(path), size) if path.exists() else weight_font(int(size * 0.8), "bold")
+    lines = str(txt).split("\n")
+    sw = max(0, int(round(size * bold))) if path.exists() else 0
+    widths = [fnt.getlength(ln) + sw * 2 for ln in lines]
+    if max_w and max(widths) > max_w:
+        return hand(txt, max(16, int(size * max_w / max(widths))), color, bold=bold)
+    ascent, descent = fnt.getmetrics()
+    lh = int((ascent + descent) * 0.92)
+    w, h = int(max(widths)) + 16, lh * len(lines) + 14 + sw * 2
+    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    rgba = tuple(color) + (255,)
+    for i, ln in enumerate(lines):
+        d.text((8 + sw, 6 + sw + i * lh), ln, font=fnt, fill=rgba, stroke_width=sw, stroke_fill=rgba)
+    return Img.from_pil(im)
+
+
+def pen_circle(w: int, h: int, color: tuple, width: float = 7, progress: float = 1.0, seed: int = 3) -> Img:
+    """빨간 펜으로 동그라미 치기 (progress만큼 그려짐). 끝이 살짝 겹치게 한 바퀴 조금 넘게."""
+    im = _big(w, h)
+    d = ImageDraw.Draw(im)
+    rng = np.random.default_rng(seed)
+    cx, cy = w * SS / 2, h * SS / 2
+    rx, ry = (w * SS - width * SS * 2) / 2, (h * SS - width * SS * 2) / 2
+    start = -100 + rng.uniform(-15, 15)
+    sweep = 380 * clamp01(progress)
+    steps = max(2, int(sweep / 4))
+    pts = []
+    for k in range(steps + 1):
+        ang = math.radians(start + sweep * k / steps)
+        wob = 1 + 0.035 * math.sin(3 * ang + seed) - 0.03 * (k / steps)
+        pts.append((cx + rx * wob * math.cos(ang), cy + ry * wob * math.sin(ang) * 0.96))
+    if len(pts) > 1:
+        d.line(pts, fill=tuple(color) + (255,), width=int(width * SS), joint="curve")
+    return _small(im, w, h)
+
+
+def pen_line(w: int, color: tuple, width: float = 7, progress: float = 1.0, slope: float = -0.06) -> Img:
+    """펜으로 쭉 긋기 (취소선·밑줄)."""
+    h = int(width * 3 + abs(slope) * w + 4)
+    im = _big(w, h)
+    d = ImageDraw.Draw(im)
+    x1 = w * clamp01(progress)
+    y0 = h / 2 - slope * w / 2
+    d.line([(4 * SS, y0 * SS), (max(4, x1) * SS, (y0 + slope * x1) * SS)], fill=tuple(color) + (255,), width=int(width * SS))
+    return _small(im, w, h)
+
+
+def hero(txt: str, size: int, th: dict, max_w: int = 960, marker: float = 1.0) -> Img:
+    """큰 강조 글씨. 네온: 형광 연두 + 짙은 테두리 + 번짐 / 노트: 먹색 굵은 글씨 + 형광펜 밑칠."""
+    if th.get("hero") == "ink":
+        body = txt if "[[" in txt else f"[[{txt}]]"
+        return text(body, size, th, weight="black", fill=th["text"], max_w=max_w, mark="highlight", marker=marker)
     return text(txt, size, th, weight="black", fill=th["accent"], accent=th["accent"], stroke=max(4, size // 13),
                 stroke_fill=th["accent_dark"], glow=th["glow"], glow_r=max(6, size // 9), glow_a=0.42, max_w=max_w)
 
@@ -301,14 +405,183 @@ def label(txt: str, size: int, th: dict, max_w: int | None = None, weight: str =
     return text(txt, size, th, weight=weight, fill=fill, max_w=max_w)
 
 
+def is_note(th: dict) -> bool:
+    return th.get("kind") == "note"
+
+
+def marked(txt: str) -> str:
+    """형광펜으로 칠할 부분이 없으면 전체를 칠한다."""
+    return txt if "[[" in txt else f"[[{txt}]]"
+
+
+# ---------- 노트 꾸미기: 스티커 · 테이프 · 포스트잇 · 그림자 · 펜 ----------
+_STICKERS = {}
+
+
+def sticker(name: str | None, size: int, outline: int = 8, shadow: float = 0.22) -> Img | None:
+    """3D 그림 스티커를 다꾸 스티커처럼(흰 테두리 + 그림자) 만든다. 그림을 못 구하면 None."""
+    if not name:
+        return None
+    key = (name, int(size), outline, shadow)
+    if key in _STICKERS:
+        return _STICKERS[key]
+    import cv2
+
+    from . import stickers
+
+    p = stickers.path(name)
+    if p is None:
+        _STICKERS[key] = None
+        return None
+    src = Image.open(p).convert("RGBA")
+    src = src.resize((int(size), max(1, int(size * src.height / src.width))), Image.LANCZOS)
+    pad = outline + 16
+    w, h = src.width + pad * 2, src.height + pad * 2
+    a = np.zeros((h, w), np.uint8)
+    a[pad : pad + src.height, pad : pad + src.width] = np.asarray(src.getchannel("A"))
+    grown = a
+    if outline:
+        k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (outline * 2 + 1, outline * 2 + 1))
+        grown = cv2.GaussianBlur(cv2.dilate((a > 40).astype(np.uint8) * 255, k), (0, 0), 1.0)
+    out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    if shadow > 0:
+        sh = cv2.GaussianBlur(grown.astype(np.float32), (0, 0), 7) * shadow
+        sh = np.roll(sh, 6, axis=0)
+        layer = Image.new("RGBA", (w, h), (70, 50, 30, 0))
+        layer.putalpha(Image.fromarray(sh.clip(0, 255).astype(np.uint8)))
+        out = Image.alpha_composite(out, layer)
+    if outline:
+        white = Image.new("RGBA", (w, h), (255, 255, 255, 0))
+        white.putalpha(Image.fromarray(grown))
+        out = Image.alpha_composite(out, white)
+    layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    layer.paste(src, (pad, pad))
+    out = Image.alpha_composite(out, layer)
+    _STICKERS[key] = Img.from_pil(out)
+    return _STICKERS[key]
+
+
+def tape_pil(w: int = 170, h: int = 46, color=(255, 236, 170), alpha: float = 0.8, seed: int = 1) -> Image.Image:
+    """마스킹 테이프 한 조각: 양 끝이 찢긴 반투명 띠."""
+    rng = np.random.default_rng(seed)
+    im = _big(w, h)
+    d = ImageDraw.Draw(im)
+    teeth = 7
+    left = [(rng.uniform(0, 7) * SS, h * SS * k / teeth) for k in range(teeth + 1)]
+    right = [((w - rng.uniform(0, 7)) * SS, h * SS * (teeth - k) / teeth) for k in range(teeth + 1)]
+    d.polygon(left + right, fill=tuple(color) + (int(255 * alpha),))
+    for k in range(3, w - 6, 12):  # 테이프 결
+        d.line([(k * SS, 2 * SS), (k * SS, (h - 2) * SS)], fill=(255, 255, 255, 28), width=SS)
+    return im.resize((w, h), Image.LANCZOS)
+
+
+def tape(w: int = 170, h: int = 46, angle: float = -4, color=(255, 236, 170), alpha: float = 0.8, seed: int = 1) -> Img:
+    return Img.from_pil(tape_pil(w, h, color, alpha, seed)).rotated(angle)
+
+
+def soft_shadow(w: int, h: int, r: float = 22, blur: int = 16, alpha: float = 0.22, color=(70, 50, 30)) -> tuple:
+    """종이 카드 그림자: (이미지, 여백). 카드 왼쪽 위 기준 (-여백, -여백 + 아래로 조금)에 놓는다."""
+    pad = blur * 2
+    im = Image.new("L", (w + pad * 2, h + pad * 2), 0)
+    ImageDraw.Draw(im).rounded_rectangle([pad, pad, pad + w, pad + h], radius=r, fill=int(255 * alpha))
+    im = im.filter(ImageFilter.GaussianBlur(blur))
+    rgba = Image.new("RGBA", im.size, tuple(color) + (0,))
+    rgba.putalpha(im)
+    return Img.from_pil(rgba), pad
+
+
+STICKY_PAD = 30
+
+
+def sticky_pil(w: int, h: int, color, seed: int = 0, with_tape: bool = True) -> Image.Image:
+    """포스트잇 한 장 (여백 STICKY_PAD 포함): 아래로 갈수록 살짝 진하고, 아래쪽이 들뜬 그림자, 위에 테이프."""
+    pad = STICKY_PAD
+    W2, H2 = w + pad * 2, h + pad * 2
+    sh = Image.new("L", (W2, H2), 0)
+    ImageDraw.Draw(sh).polygon([(pad + 8, pad + 14), (pad + w - 6, pad + 14), (pad + w + 3, pad + h + 9), (pad + 6, pad + h + 4)], fill=80)
+    sh = sh.filter(ImageFilter.GaussianBlur(9))
+    out = Image.new("RGBA", (W2, H2), (70, 50, 30, 0))
+    out.putalpha(sh)
+    arr = np.empty((h, w, 4), np.float32)
+    arr[..., :3] = np.array(color, np.float32)
+    arr[..., :3] *= np.linspace(1.0, 0.95, h, dtype=np.float32)[:, None, None]
+    arr[..., 3] = 255
+    note = Image.fromarray(arr.clip(0, 255).astype(np.uint8), "RGBA")
+    out.paste(note, (pad, pad), note)
+    if with_tape:
+        tp = tape_pil(min(170, int(w * 0.42)), 44, seed=seed + 3).rotate(np.random.default_rng(seed).uniform(-6, 6), resample=Image.BICUBIC, expand=True)
+        out.alpha_composite(tp, (int(pad + (w - tp.width) / 2), max(0, pad - tp.height // 2)))
+    return out
+
+
+def inkify(im: Image.Image, seed: int = 0, strength: float = 0.45) -> Image.Image:
+    """도장 잉크처럼: 알파에 얼룩·긁힘을 넣는다."""
+    import cv2
+
+    rng = np.random.default_rng(seed)
+    w, h = im.size
+    low = cv2.resize(rng.uniform(0, 1, (max(2, h // 18), max(2, w // 18))).astype(np.float32), (w, h), interpolation=cv2.INTER_CUBIC)
+    fine = rng.uniform(0, 1, (h, w)).astype(np.float32)
+    keep = np.clip(1 - strength * (0.65 * low + 0.35 * fine) + 0.12, 0.25, 1)
+    keep[fine > 0.985] = 0.15  # 잉크가 안 묻은 작은 점
+    a = np.asarray(im.getchannel("A"), np.float32) * keep
+    out = im.copy()
+    out.putalpha(Image.fromarray(a.clip(0, 255).astype(np.uint8)))
+    return out
+
+
+def pen_x(size: int, color: tuple, width: float = 9, progress: float = 1.0) -> Img:
+    """빨간 펜으로 X 긋기 (앞 획 → 뒤 획)."""
+    im = _big(size, size)
+    d = ImageDraw.Draw(im)
+    S = size * SS
+    rgba = tuple(color) + (255,)
+    for k, (a, b) in enumerate((((0.16, 0.14), (0.86, 0.84)), ((0.84, 0.16), (0.14, 0.88)))):
+        p = clamp01(progress * 2 - k)
+        if p <= 0:
+            break
+        end = (a[0] + (b[0] - a[0]) * p, a[1] + (b[1] - a[1]) * p)
+        d.line([(a[0] * S, a[1] * S), (end[0] * S, end[1] * S)], fill=rgba, width=int(width * SS))
+        r = width * SS / 2
+        for x, y in (a, end):
+            d.ellipse([x * S - r, y * S - r, x * S + r, y * S + r], fill=rgba)
+    return _small(im, size, size)
+
+
+def pen_arrow(w: int, h: int, color: tuple, width: float = 6, progress: float = 1.0, start=(0.0, 0.0), end=(1.0, 1.0), bend: float = 0.25) -> Img:
+    """손으로 그린 휘어진 화살표 (start → end, 0~1 비율 좌표). progress만큼 그려지고 끝에 화살촉."""
+    im = _big(w, h)
+    d = ImageDraw.Draw(im)
+    p0 = np.array([start[0] * w, start[1] * h]) * SS
+    p2 = np.array([end[0] * w, end[1] * h]) * SS
+    mid = (p0 + p2) / 2
+    normal = np.array([-(p2 - p0)[1], (p2 - p0)[0]])
+    p1 = mid + normal * bend
+    n = 40
+    m = max(2, int(n * clamp01(progress)))
+    pts = [tuple((1 - u) ** 2 * p0 + 2 * (1 - u) * u * p1 + u**2 * p2) for u in np.linspace(0, clamp01(progress), m)]
+    rgba = tuple(color) + (255,)
+    d.line(pts, fill=rgba, width=int(width * SS), joint="curve")
+    if progress >= 0.9 and len(pts) > 2:
+        tip = np.array(pts[-1])
+        back = np.array(pts[-4])
+        v = (tip - back) / (np.linalg.norm(tip - back) + 1e-6)
+        L = width * SS * 4.2
+        for ang in (0.5, -0.5):
+            rot = np.array([[math.cos(ang), -math.sin(ang)], [math.sin(ang), math.cos(ang)]])
+            q = tip - rot @ v * L
+            d.line([tuple(tip), tuple(q)], fill=rgba, width=int(width * SS))
+    return _small(im, w, h)
+
+
 # ---------- 아이콘 (그림 글자 대신 직접 그린 단순한 아이콘) ----------
 ICON_COLORS = {
-    "spark": "orange", "zoom": (110, 196, 255), "sound": (210, 214, 224), "caption": (240, 240, 255), "bolt": (255, 150, 40),
-    "cut": (240, 240, 240), "clock": (240, 240, 240), "calendar": (90, 140, 255), "mic": (230, 230, 230), "pin": (255, 70, 90),
-    "money": (255, 205, 60), "chart": "accent", "home": (240, 240, 240), "heart": (255, 70, 100), "send": "accent",
+    "spark": "orange", "zoom": (110, 196, 255), "sound": (120, 130, 150), "caption": (150, 170, 255), "bolt": (255, 150, 40),
+    "cut": "icon", "clock": "icon", "calendar": (90, 140, 255), "mic": "icon", "pin": (255, 70, 90),
+    "money": (255, 205, 60), "chart": "accent", "home": "icon", "heart": (255, 70, 100), "send": "accent",
     "mail": (255, 110, 140), "star": (255, 210, 60), "fire": (255, 120, 40), "warning": (255, 200, 40), "up": "accent",
-    "down": "accent", "x": (255, 82, 82), "play": (240, 240, 240), "gift": (255, 82, 82), "phone": (230, 230, 230),
-    "user": (230, 230, 230), "check": "accent", "bank": (240, 240, 240), "doc": (230, 230, 230),
+    "down": "accent", "x": (255, 82, 82), "play": "icon", "gift": (255, 82, 82), "phone": "icon",
+    "user": "icon", "check": "accent", "bank": "icon", "doc": "icon",
 }
 ICONS = sorted(ICON_COLORS)
 
@@ -322,6 +595,8 @@ def icon(name: str, size: int, th: dict, color=None) -> Img | None:
     d = ImageDraw.Draw(im)
     rgba = tuple(c) + (255,)
     dark = (12, 12, 12, 255)
+    mark = tuple(th.get("on_accent", (12, 12, 12))) + (255,)  # 색 원 위에 그리는 표시(체크·종이비행기)
+    hole = tuple(th.get("card", (20, 20, 21))) + (255,)
 
     def P(x, y):
         return (x * S, y * S)
@@ -337,7 +612,7 @@ def icon(name: str, size: int, th: dict, color=None) -> Img | None:
 
     if name == "check":
         oval(0, 0, 1, 1, fill=rgba)
-        line([(0.27, 0.52), (0.43, 0.68), (0.74, 0.35)], 0.11, dark)
+        line([(0.27, 0.52), (0.43, 0.68), (0.74, 0.35)], 0.11, mark)
     elif name == "spark":
         for k in range(8):
             ang = math.pi / 8 + k * math.pi / 4
@@ -391,14 +666,14 @@ def icon(name: str, size: int, th: dict, color=None) -> Img | None:
     elif name == "home":
         d.polygon([P(0.5, 0.06), P(0.96, 0.48), P(0.04, 0.48)], fill=rgba)
         d.rectangle([P(0.18, 0.46), P(0.82, 0.94)], fill=rgba)
-        d.rectangle([P(0.42, 0.62), P(0.58, 0.94)], fill=dark)
+        d.rectangle([P(0.42, 0.62), P(0.58, 0.94)], fill=hole)
     elif name == "heart":
         oval(0.06, 0.12, 0.54, 0.6, fill=rgba)
         oval(0.46, 0.12, 0.94, 0.6, fill=rgba)
         d.polygon([P(0.09, 0.46), P(0.5, 0.92), P(0.91, 0.46), P(0.5, 0.3)], fill=rgba)
     elif name == "send":
         oval(0, 0, 1, 1, fill=rgba)
-        d.polygon([P(0.32, 0.26), P(0.78, 0.5), P(0.32, 0.74), P(0.4, 0.5)], fill=dark)
+        d.polygon([P(0.32, 0.26), P(0.78, 0.5), P(0.32, 0.74), P(0.4, 0.5)], fill=mark)
     elif name == "mail":
         d.rounded_rectangle([P(0.06, 0.5), P(0.94, 0.94)], radius=0.1 * S, fill=(240, 240, 245, 255))
         line([(0.5, 0.06), (0.5, 0.58)], 0.12)
@@ -484,6 +759,8 @@ class Card:
     """카드 한 장. timing.at('단어', 기본값) → 장면 안에서의 시각(초)."""
 
     sfx_events: list
+    paper = False  # 종이 카드면 화면에 놓을 때 그림자·테이프를 붙이고 살짝 기울인다
+    paper_radius = 22
 
     def __init__(self, spec: dict, th: dict, timing):
         self.spec = spec
@@ -514,14 +791,23 @@ class Card:
     def draw(self, t: float) -> Img:
         raise NotImplementedError
 
+    def shake(self, t: float) -> tuple:
+        """카드 흔들림 (x, y) 픽셀. 쾅 찍히는 순간에만."""
+        return 0.0, 0.0
+
     def box(self, w: int, h: int, accent: bool = False) -> Img:
         th = self.th
+        if th.get("card_style") == "paper":
+            self.paper = True
+            return rounded(w, h, self.paper_radius, th["card"], border=th["card_border"], bw=2)
         return rounded(w, h, 36, th["card"], border=th["card_border_accent"] if accent else th["card_border"], bw=3, alpha=0.96)
 
-    def header(self, title: str, icon_name: str | None, size: int = 50) -> Img:
+    def header(self, title: str, icon_name: str | None, size: int = 50, sticker_name: str | None = None) -> Img:
         th = self.th
         txt = text(title, size, th, max_w=CARD_W - 200)
-        ic = icon(icon_name, int(size * 1.1), th) if icon_name else None
+        ic = sticker(sticker_name, int(size * 1.5), outline=5, shadow=0.15) if sticker_name else None
+        if ic is None:
+            ic = icon(icon_name, int(size * 1.1), th) if icon_name else None
         w = txt.w + (ic.w + 14 if ic else 0)
         h = max(txt.h, ic.h if ic else 0)
         c = Canvas(w, h)
@@ -534,7 +820,10 @@ class Card:
 
 
 class ChecklistCard(Card):
+    """체크리스트. mark='x'면 빨간 펜 X + 취소선 ('깨면 사라지는 것' 같은 목록). 항목마다 sub(작은 설명) 가능."""
+
     ROW = 112
+    SWIPE = 0.35  # 형광펜·취소선이 그어지는 시간
 
     def __init__(self, spec, th, timing):
         super().__init__(spec, th, timing)
@@ -544,23 +833,42 @@ class ChecklistCard(Card):
         self.items = [i if isinstance(i, dict) else {"text": str(i)} for i in items]
         n = len(self.items)
         self.w = CARD_W
-        self.head = self.header(spec.get("title", ""), spec.get("icon", "spark")) if spec.get("title") else None
+        self.mode = spec.get("mark", "check")
+        self.note = is_note(th)
+        self.head = self.header(spec.get("title", ""), spec.get("icon", "spark"), sticker_name=spec.get("sticker")) if spec.get("title") else None
         top = 150 if self.head else 50
-        self.h = top + n * self.ROW + 40
+        self.icons = [sticker(i.get("sticker"), 64, outline=4, shadow=0.12) or icon(i.get("icon"), 60, th) for i in self.items]
+        self.tx = [160 + (84 if ic else 0) for ic in self.icons]
+        self.subs = [text(i["sub"], 36, th, fill=th["muted"], weight="bold", max_w=self.w - tx - 40) if i.get("sub") else None for i, tx in zip(self.items, self.tx)]
+        self.row = self.ROW + (46 if any(self.subs) else 0)
+        self.h = top + n * self.row + 40
         self.top = top
         self.bg = self.box(self.w, self.h, accent=spec.get("accent_border", True))
         self.divider = rounded(self.w - 112, 4, 2, th["card_border"])
         self.ring = disc(72, None, ring=th["dim"], rw=5)
         self.check = icon("check", 72, th)
-        self.icons = [icon(i.get("icon"), 60, th) for i in self.items]
-        self.off = [text(i["text"], 62, th, fill=th["dim"], max_w=self.w - 320) for i in self.items]
-        self.on = [text(i["text"], 62, th, max_w=self.w - 320) for i in self.items]
+        plain_fill = th["text"] if self.mode == "x" else th["dim"]
+        self.off = [text(i["text"], 62, th, fill=plain_fill, max_w=self.w - tx - 40) for i, tx in zip(self.items, self.tx)]
+        self.on = [text(i["text"], 62, th, fill=th["muted"] if self.mode == "x" else None, max_w=self.w - tx - 40) for i, tx in zip(self.items, self.tx)]
+        self._anim = {}
         defaults = self.spread(n)
         self.when = [self.at(i.get("at"), d) for i, d in zip(self.items, defaults)]
-        self.sfx_events = [("ding", t) for t in self.when]
+        self.sfx_events = [("pop" if self.mode == "x" else "ding", t) for t in self.when]
 
     def state(self, t):
-        return tuple(round(min(max(t - w, -0.01), 0.3), 2) for w in self.when)
+        return tuple(round(min(max(t - w, -0.01), self.SWIPE + 0.05), 2) for w in self.when)
+
+    def _anim_img(self, kind: str, i: int, p: float) -> Img:
+        p = round(clamp01(p), 2)
+        key = (kind, i, p)
+        if key not in self._anim:
+            if kind == "hl":  # 체크되면 형광펜이 칠해진다
+                self._anim[key] = text(marked(self.items[i]["text"]), 62, self.th, mark="highlight", marker=p, max_w=self.w - self.tx[i] - 40)
+            elif kind == "x":
+                self._anim[key] = pen_x(72, self.th["pen"], 9, p)
+            else:  # 취소선
+                self._anim[key] = pen_line(int(self.off[i].w - 4), self.th["pen"], 7, p, slope=-0.025)
+        return self._anim[key]
 
     def draw(self, t):
         c = Canvas(self.w, self.h)
@@ -569,20 +877,37 @@ class ChecklistCard(Card):
             c.put(self.head, 56, 70 - self.head.h / 2)
             c.put(self.divider, 56, 128)
         for i in range(len(self.items)):
-            y = self.top + i * self.ROW + self.ROW / 2
+            y = self.top + i * self.row + self.row / 2
+            ty = y - (22 if self.subs[i] else 0)
             p = t - self.when[i]
+            x = self.tx[i]
+            off, on = self.off[i], self.on[i]
             if p < 0:
-                c.put(self.ring, 56, y - 36)
-                c.put(self.off[i], 160 + (76 if self.icons[i] else 0), y - self.off[i].h / 2)
+                c.put(self.ring, 56, ty - 36)
+                c.put(off, x, ty - off.h / 2)
+            elif self.mode == "x":
+                c.put(self.ring, 56, ty - 36, alpha=0.5)
+                c.put(self._anim_img("x", i, p / 0.25), 56, ty - 36)
+                fade = clamp01((p - 0.2) / 0.25)
+                c.put(off, x, ty - off.h / 2, alpha=1 - fade)
+                c.put(on, x, ty - on.h / 2, alpha=fade)
+                strike = self._anim_img("strike", i, (p - 0.1) / self.SWIPE)
+                c.put(strike, x + 2, ty - strike.h / 2 + 4)
             else:
                 s, a = pop(p, 0.25, 0.5)
-                c.put(self.check, 56, y - 36, alpha=a, scale=s)
-                fade = clamp01(p / 0.15)
-                x = 160 + (76 if self.icons[i] else 0)
-                c.put(self.off[i], x, y - self.off[i].h / 2, alpha=1 - fade)
-                c.put(self.on[i], x, y - self.on[i].h / 2, alpha=fade)
+                c.put(self.check, 56, ty - 36, alpha=a, scale=s)
+                if self.note:
+                    img = self._anim_img("hl", i, p / self.SWIPE)
+                    c.put(img, x, ty - img.h / 2)
+                else:
+                    fade = clamp01(p / 0.15)
+                    c.put(off, x, ty - off.h / 2, alpha=1 - fade)
+                    c.put(on, x, ty - on.h / 2, alpha=fade)
+            if self.subs[i]:
+                c.put(self.subs[i], x + 2, ty + 30, alpha=1.0 if p >= 0 or self.mode == "x" else 0.6)
             if self.icons[i]:
-                c.put(self.icons[i], 160, y - 30)
+                ic = self.icons[i]
+                c.put(ic, 160 + (64 - ic.w) / 2 + 4, ty - ic.h / 2)
         return c.img()
 
 
@@ -590,18 +915,24 @@ class BigTextCard(Card):
     def __init__(self, spec, th, timing):
         super().__init__(spec, th, timing)
         lines = spec.get("lines") or [spec.get("text", "")]
+        self.note = is_note(th)
+        self.hero_size = int(spec.get("size", 250))
+        self.hero_text = None
+        self._anim = {}
         self.parts = []
         for ln in lines:
             if re.fullmatch(r"\s*\[\[.+\]\]\s*", ln):
-                self.parts.append(("hero", hero(plain(ln).strip(), int(spec.get("size", 250)), th, max_w=900)))
+                self.hero_text = plain(ln).strip()
+                self.parts.append(("hero", hero(self.hero_text, self.hero_size, th, max_w=900)))
             else:
                 self.parts.append(("plain", text(ln, 84, th, max_w=960)))
-        self.underline = spec.get("underline", True) and any(k == "hero" for k, _ in self.parts)
+        # 노트 테마는 형광펜이 밑줄 역할을 한다
+        self.underline = spec.get("underline", not self.note) and any(k == "hero" for k, _ in self.parts)
         self.pill = None
         if spec.get("pill"):
-            txt = text(spec["pill"], 44, th, max_w=760)
+            txt = text(spec["pill"], 44, th, fill=th.get("pill_text"), max_w=760)
             self.pill = Canvas(txt.w + 56, txt.h + 20)
-            self.pill.put(rounded(txt.w + 56, txt.h + 20, (txt.h + 20) / 2, (31, 31, 33), border=(62, 62, 66), bw=2), 0, 0)
+            self.pill.put(rounded(txt.w + 56, txt.h + 20, (txt.h + 20) / 2, th["pill"], border=th["pill_border"], bw=2), 0, 0)
             self.pill.put(txt, 28, 10)
             self.pill = self.pill.img()
         gap = 14
@@ -633,17 +964,38 @@ class BigTextCard(Card):
         self.pill_t = self.at(spec.get("pill_at"), self.bar_t + 0.35)
         rng = np.random.default_rng(len(lines) * 7 + 3)
         self.sparks = [(rng.uniform(0.02, 0.98) * self.w, rng.uniform(0.0, 1.0) * self.h, rng.uniform(0, 1), rng.choice([14, 18, 24])) for _ in range(7)]
-        self.star = {s: icon("star", s, th, color=(235, 245, 230)) for s in (14, 18, 24)}
+        self.star = {s: icon("star", s, th, color=th.get("spark", (235, 245, 230))) for s in (14, 18, 24)}
         self.sfx_events = [("pop", w) for w in self.when] + ([("pop", self.pill_t)] if self.pill else [])
+
+    def _hero(self, p: float) -> Img:
+        p = round(clamp01(p), 2)
+        if p not in self._anim:
+            self._anim[p] = hero(self.hero_text, self.hero_size, self.th, max_w=900, marker=p)
+        return self._anim[p]
 
     def draw(self, t):
         c = Canvas(self.w, self.h)
         if self.hero_i is not None and t > self.when[self.hero_i]:
-            for x, y, ph, s in self.sparks:  # 반짝이
-                a = 0.25 + 0.75 * abs(math.sin(2 * math.pi * (t * 0.7 + ph)))
-                c.put(self.star[s], x - s / 2, y - s / 2, alpha=a * clamp01((t - self.when[self.hero_i]) / 0.4))
+            if self.note:  # 노트: 빨간 펜으로 그은 강조 표시 세 줄
+                hero_img = self.parts[self.hero_i][1]
+                hx = (self.w + hero_img.w) / 2 - 30
+                hy = self.ys[self.hero_i] + 10
+                q = clamp01((t - self.when[self.hero_i] - 0.25) / 0.25)
+                for k, ang in enumerate((-70, -40, -10)):
+                    if q * 3 > k:
+                        rad = math.radians(ang)
+                        x0, y0 = hx + 18 * math.cos(rad), hy + 18 * math.sin(rad)
+                        seg = pen_line(46, self.th["pen"], 7, 1.0, slope=0)
+                        seg = seg.rotated(-ang)
+                        c.put(seg, x0 + 23 * math.cos(rad) - seg.w / 2, y0 + 23 * math.sin(rad) - seg.h / 2)
+            else:
+                for x, y, ph, s in self.sparks:  # 반짝이
+                    a = 0.25 + 0.75 * abs(math.sin(2 * math.pi * (t * 0.7 + ph)))
+                    c.put(self.star[s], x - s / 2, y - s / 2, alpha=a * clamp01((t - self.when[self.hero_i]) / 0.4))
         for (kind, img), y, w in zip(self.parts, self.ys, self.when):
             s, a = pop(t - w, 0.3, 0.55 if kind == "hero" else 0.8)
+            if kind == "hero" and self.note and t >= w:
+                img = self._hero((t - w - 0.12) / 0.35)  # 글자가 찍힌 뒤 형광펜이 쓱
             c.put(img, (self.w - img.w) / 2, y, alpha=a, scale=s)
         if self.underline:
             p = ease_out_cubic((t - self.bar_t) / 0.35)
@@ -668,13 +1020,17 @@ class CompareCard(Card):
             raise EditorError("compare 카드에는 bars가 필요합니다.")
         self.mode = spec.get("mode", "replace" if len(self.bars) == 2 else "stack")
         self.w = CARD_W
-        self.head = self.header(spec.get("title", ""), spec.get("icon", "clock")) if spec.get("title") else None
+        self.note = is_note(th)
+        self.radius = 18 if self.note else self.BAR_H / 2
+        self._anim = {}
+        self.head = self.header(spec.get("title", ""), spec.get("icon", "clock"), sticker_name=spec.get("sticker")) if spec.get("title") else None
         self.track_w = self.w - 112
         rows = 1 if self.mode == "replace" else len(self.bars)
         self.top = 120 if self.head else 40
         self.result = hero(spec["result"], int(spec.get("result_size", 104)), th, max_w=self.w - 80) if spec.get("result") else None
-        self.h = self.top + rows * (self.BAR_H + 28) + (self.result.h + 10 if self.result else 0) + 30
-        self.track = rounded(self.track_w, self.BAR_H, self.BAR_H / 2, th["track"])
+        self.foot = text(spec["source"], 30, th, fill=th["muted"], weight="bold", max_w=self.w - 120) if spec.get("source") else None
+        self.h = self.top + rows * (self.BAR_H + 28) + (self.result.h + 10 if self.result else 0) + 30 + (self.foot.h if self.foot else 0)
+        self.track = rounded(self.track_w, self.BAR_H, self.radius, th["track"])
         self.labels = []
         for b in self.bars:
             c = col(th, b.get("color", "accent"))
@@ -689,13 +1045,19 @@ class CompareCard(Card):
         b = self.bars[i]
         full = max(self.labels[i].w + 72, int(self.track_w * float(b.get("value", 1.0))))  # 글자가 들어갈 만큼은 늘 확보
         width = max(self.BAR_H, int(full * frac))
-        return rounded(width, self.BAR_H, self.BAR_H / 2, col(self.th, b.get("color", "accent")))
+        return rounded(width, self.BAR_H, self.radius, col(self.th, b.get("color", "accent")))
+
+    def _result(self, p: float) -> Img:
+        p = round(clamp01(p), 2)
+        if p not in self._anim:
+            self._anim[p] = hero(self.spec["result"], int(self.spec.get("result_size", 104)), self.th, max_w=self.w - 80, marker=p)
+        return self._anim[p]
 
     def _full(self, i: int) -> float:
         return max(self.labels[i].w + 72, self.track_w * float(self.bars[i].get("value", 1.0)))
 
     def state(self, t):
-        return tuple(round(clamp01((t - w) / 0.5), 2) for w in self.when) + (round(clamp01((t - self.result_t) / 0.3), 2),)
+        return tuple(round(clamp01((t - w) / 0.5), 2) for w in self.when) + (round(clamp01((t - self.result_t) / 0.3), 2), round(clamp01((t - self.result_t - 0.15) / 0.35), 2))
 
     def draw(self, t):
         c = Canvas(self.w, self.h)
@@ -727,10 +1089,13 @@ class CompareCard(Card):
                     lab = self.labels[row]
                     if bar.w > lab.w + 40:
                         c.put(lab, 56 + 32, y + (self.BAR_H - lab.h) / 2, alpha=clamp01((t - self.when[row]) / 0.25))
+        rows = 1 if self.mode == "replace" else len(self.bars)
         if self.result:
             s, a = pop(t - self.result_t, 0.3, 0.6)
-            rows = 1 if self.mode == "replace" else len(self.bars)
-            c.put(self.result, (self.w - self.result.w) / 2, self.top + rows * (self.BAR_H + 28) - 6, alpha=a, scale=s)
+            img = self._result((t - self.result_t - 0.15) / 0.35) if self.note and t >= self.result_t else self.result
+            c.put(img, (self.w - img.w) / 2, self.top + rows * (self.BAR_H + 28) - 6, alpha=a, scale=s)
+        if self.foot:
+            c.put(self.foot, self.w - self.foot.w - 40, self.h - self.foot.h - 4, alpha=0.9)
         return c.img()
 
 
@@ -748,8 +1113,8 @@ class CalendarCard(Card):
         self.gap = gap
         self.h = 130 + self.bh + 56
         self.bg = self.box(self.w, self.h)
-        self.cell_off = rounded(self.bw, self.bh, 20, (26, 26, 28), border=(46, 46, 50), bw=2)
-        self.cell_on = rounded(self.bw, self.bh, 20, (26, 30, 22), border=th["accent"], bw=4)
+        self.cell_off = rounded(self.bw, self.bh, 20, th["cell"], border=th["cell_border"], bw=2)
+        self.cell_on = rounded(self.bw, self.bh, 20, th["cell_on"], border=th["accent"], bw=4)
         self.lab_off = [text(d, 38, th, fill=th["muted"]) for d in self.days]
         self.lab_on = [text(d, 38, th) for d in self.days]
         self.check = icon("check", min(64, self.bw - 24), th)
@@ -796,7 +1161,7 @@ class CommentCard(Card):
         self.lead = lc.img()
         self.kw = hero(f"'{self.keyword}'", int(spec.get("size", 160)), th, max_w=self.w - 40)
         self.box_h = 200
-        self.cbox = rounded(self.w - 40, self.box_h, 28, (22, 22, 24), border=(48, 48, 52), bw=2)
+        self.cbox = rounded(self.w - 40, self.box_h, 28, th["panel"], border=th["panel_border"], bw=2)
         ava = Image.new("RGBA", (60 * SS, 60 * SS))
         grad = Image.linear_gradient("L").resize((60 * SS, 60 * SS)).rotate(45)
         ava_rgb = Image.merge("RGB", [Image.new("L", (60 * SS, 60 * SS), 255), grad, Image.new("L", (60 * SS, 60 * SS), 140)])
@@ -805,8 +1170,8 @@ class CommentCard(Card):
         ava.paste(ava_rgb, (0, 0), mask)
         self.avatar = _small(ava, 60, 60)
         self.meta = text(spec.get("me", "나 · 방금"), 28, th, fill=th["muted"], weight="bold")
-        self.avatar_gray = disc(48, (70, 70, 74))
-        self.input = rounded(self.w - 220, 66, 33, (28, 28, 30), border=(56, 56, 60), bw=2)
+        self.avatar_gray = disc(48, th["dim"])
+        self.input = rounded(self.w - 220, 66, 33, th["input"], border=th["input_border"], bw=2)
         self.hint = text("댓글 달기...", 32, th, fill=th["muted"], weight="bold")
         self.send = icon("send", 70, th)
         self.heart = icon("heart", 40, th)
@@ -916,7 +1281,7 @@ class WaveformCard(Card):
                 center = (i + 1) / (k + 1)
                 spans.append((center - 0.075, center + 0.075))
         self.spans = spans
-        self.tags = [text(m.get("label", ""), 34, th, weight="extrabold") for m in self.marks]
+        self.tags = [text(m.get("label", ""), 34, th, weight="extrabold", fill=(255, 255, 255)) for m in self.marks]
         defaults = self.spread(k, 0.45, 0.75)
         self.when = [self.at(m.get("at"), d) for m, d in zip(self.marks, defaults)]
         self.cut_t = self.at(spec.get("cut_at"), 1e9) if spec.get("cut_at") else 1e9
@@ -947,7 +1312,7 @@ class WaveformCard(Card):
                     continue
             key = (int(bh) // 2 * 2, bool(marked), bw)
             if key not in self._bars:
-                self._bars[key] = rounded(bw, max(2, key[0]), bw / 2, th["red"] if marked else (235, 235, 235))
+                self._bars[key] = rounded(bw, max(2, key[0]), bw / 2, th["red"] if marked else th["bar"])
             x = x0 + i * step + (step - bw) / 2
             c.put(self._bars[key], x, mid - key[0] / 2)
         for m, (a, b) in enumerate(self.spans):
@@ -957,10 +1322,10 @@ class WaveformCard(Card):
             s, al = pop(p, 0.25, 0.85)
             al *= 1 - cut
             bx0, bx1 = x0 + a * span_w - 6, x0 + b * span_w + 6
-            box = rounded(int(bx1 - bx0), int(y1 - y0 + 30), 16, (120, 20, 20), border=th["red"], bw=4, alpha=0.35)
+            box = rounded(int(bx1 - bx0), int(y1 - y0 + 30), 16, th["mark_fill"], border=th["red"], bw=4, alpha=0.35 if not is_note(th) else 0.12)
             c.put(box, bx0, y0 - 15, alpha=al)
             tag = self.tags[m]
-            pill = rounded(tag.w + 28, tag.h + 6, 12, (240, 70, 70))
+            pill = rounded(tag.w + 28, tag.h + 6, 12, th["pen"])
             cx = (bx0 + bx1) / 2
             c.put(pill, cx - pill.w / 2, y0 - 30 - pill.h, alpha=al, scale=s)
             c.put(tag, cx - tag.w / 2, y0 - 27 - pill.h, alpha=al, scale=s)
@@ -977,7 +1342,7 @@ class StepsCard(Card):
             raise EditorError("steps 카드에는 steps가 필요합니다.")
         self.steps = [s if isinstance(s, dict) else {"text": str(s)} for s in steps]
         self.w = CARD_W
-        self.head = self.header(spec["title"], spec.get("icon")) if spec.get("title") else None
+        self.head = self.header(spec["title"], spec.get("icon"), sticker_name=spec.get("sticker")) if spec.get("title") else None
         self.top = 130 if self.head else 50
         self.h = self.top + len(self.steps) * self.ROW + 30
         self.bg = self.box(self.w, self.h)
@@ -985,7 +1350,7 @@ class StepsCard(Card):
         for i in range(len(self.steps)):
             d = Canvas(76, 76)
             d.put(disc(76, th["accent"]), 0, 0)
-            num = text(str(i + 1), 42, th, weight="black", fill=(10, 10, 10))
+            num = text(str(i + 1), 42, th, weight="black", fill=th["on_accent"])
             d.put(num, (76 - num.w) / 2, (76 - num.h) / 2)
             self.nums.append(d.img())
         self.txt = [text(s["text"], 54, th, max_w=self.w - 220, align="left") for s in self.steps]
@@ -1028,8 +1393,11 @@ class StatCard(Card):
         self.sub = text(spec["sub"], 36, th, fill=th["muted"], max_w=self.w) if spec.get("sub") else None
         self.t0 = self.at(spec.get("at"), 0.25)
         self.dur = float(spec.get("count", 0.9))
+        self.note = is_note(th)
+        self._anim = {}
         final = self._num(self.value)
         self.final_img = hero(final, self.size, th, max_w=self.w)
+        self.stk = sticker(spec.get("sticker"), int(spec.get("sticker_size", 170)))
         self.h = (self.label.h if self.label else 0) + self.final_img.h + (self.sub.h + 10 if self.sub else 0)
         self.sfx_events = [("ding", self.t0 + self.dur)]
 
@@ -1037,10 +1405,17 @@ class StatCard(Card):
         body = f"{v:,.{self.decimals}f}"
         return f"{self.prefix}{body}{self.unit}"
 
+    def _marked(self, p: float) -> Img:
+        p = round(clamp01(p), 2)
+        if p not in self._anim:
+            self._anim[p] = hero(self._num(self.value), self.size, self.th, max_w=self.w, marker=p)
+        return self._anim[p]
+
     def state(self, t):
         p = ease_out_cubic((t - self.t0) / self.dur)
         sub = round(clamp01((t - self.t0 - self.dur) / 0.3), 2) if self.sub else 0
-        return (round(p, 3), round(clamp01((t - self.t0 + 0.3) / 0.3), 2), round(clamp01(t / 0.25), 2), sub)
+        mk = round(clamp01((t - self.t0 - self.dur) / 0.35), 2) if self.note else 0
+        return (round(p, 3), round(clamp01((t - self.t0 + 0.3) / 0.3), 2), round(clamp01(t / 0.25), 2), sub, mk)
 
     def draw(self, t):
         c = Canvas(self.w, int(self.h))
@@ -1051,9 +1426,15 @@ class StatCard(Card):
             y += self.label.h - 6
         p = ease_out_cubic((t - self.t0) / self.dur)
         if t >= self.t0 - 0.2:
-            img = self.final_img if p >= 1 else hero(self._num(self.value * p), self.size, self.th, max_w=self.w)
+            if self.note:  # 노트: 숫자가 다 올라간 뒤 형광펜이 쓱 칠해진다
+                img = self._marked((t - self.t0 - self.dur) / 0.35) if p >= 1 else hero(self._num(self.value * p), self.size, self.th, max_w=self.w, marker=0)
+            else:
+                img = self.final_img if p >= 1 else hero(self._num(self.value * p), self.size, self.th, max_w=self.w)
             s, a = pop(t - self.t0 + 0.2, 0.3, 0.7)
             c.put(img, (self.w - img.w) / 2, y + (self.final_img.h - img.h) / 2, alpha=a, scale=s)
+            if self.stk is not None:
+                ss, sa = pop(t - self.t0 - self.dur, 0.3, 0.4)
+                c.put(self.stk, self.w - self.stk.w + 10, y - self.stk.h * 0.35, alpha=sa, scale=ss)
         y += self.final_img.h
         if self.sub and t >= self.t0 + self.dur:
             c.put(self.sub, (self.w - self.sub.w) / 2, y + 10, alpha=clamp01((t - self.t0 - self.dur) / 0.3))
@@ -1061,7 +1442,8 @@ class StatCard(Card):
 
 
 class ImageCard(Card):
-    """사용자 이미지(캡처 화면 등)를 둥근 테두리 안에 넣고 천천히 확대."""
+    """사진·캡처 화면을 넣고 천천히 확대. 노트 테마는 폴라로이드(흰 테두리 + 아래 손글씨 caption + 작은 credit).
+    네온 테마는 둥근 테두리. credit(출처)은 사진을 가져왔으면 꼭 적는다."""
 
     def __init__(self, spec, th, timing, base_dir: Path | None = None):
         super().__init__(spec, th, timing)
@@ -1071,16 +1453,47 @@ class ImageCard(Card):
         if not path.exists():
             raise EditorError(f"이미지 파일이 없습니다: {path}")
         im = Image.open(path).convert("RGB")
+        self.note = is_note(th)
         max_w, max_h = CARD_W, int(spec.get("max_h", 760))
+        cap = spec.get("caption")
+        credit = spec.get("credit")
+        if self.note:
+            self.ox = self.oy = 22
+            bottom = 104 if cap else (54 if credit else 22)
+            max_w, max_h = max_w - self.ox * 2, max_h - self.oy - bottom
+        else:
+            self.ox = self.oy = 0
+            bottom = 0
         scale = min(max_w / im.width, max_h / im.height)
-        self.w, self.h = int(im.width * scale), int(im.height * scale)
+        self.iw, self.ih = int(im.width * scale), int(im.height * scale)
+        self.w, self.h = self.iw + self.ox * 2, self.ih + self.oy + bottom
         self.zoom = float(spec.get("zoom", 1.06))
-        big = im.resize((int(self.w * self.zoom) + 2, int(self.h * self.zoom) + 2), Image.LANCZOS)
+        big = im.resize((int(self.iw * self.zoom) + 2, int(self.ih * self.zoom) + 2), Image.LANCZOS)
         self.big = np.asarray(big, np.float32)[..., ::-1]
-        mask = Image.new("L", (self.w * SS, self.h * SS), 0)
-        ImageDraw.Draw(mask).rounded_rectangle([0, 0, self.w * SS - 1, self.h * SS - 1], radius=32 * SS, fill=255)
-        self.mask = np.asarray(mask.resize((self.w, self.h), Image.LANCZOS), np.float32)[..., None] / 255.0
-        self.border = rounded(self.w, self.h, 32, (0, 0, 0), border=(60, 60, 64), bw=3, alpha=0.0)
+        radius = 6 if self.note else 32
+        mask = Image.new("L", (self.iw * SS, self.ih * SS), 0)
+        ImageDraw.Draw(mask).rounded_rectangle([0, 0, self.iw * SS - 1, self.ih * SS - 1], radius=radius * SS, fill=255)
+        self.mask = np.asarray(mask.resize((self.iw, self.ih), Image.LANCZOS), np.float32)[..., None] / 255.0
+        frame = Canvas(self.w, self.h)
+        if self.note:
+            self.paper = True
+            self.paper_radius = 8
+            frame.put(rounded(self.w, self.h, 8, (255, 255, 255), border=th["card_border"], bw=2), 0, 0)
+            if cap:
+                words = hand(cap, 62, th["text"], max_w=self.w - 60)
+                frame.put(words, (self.w - words.w) / 2, self.oy + self.ih + (bottom - words.h) / 2 - (10 if credit else 0))
+        self.under = frame.img()
+        over = Canvas(self.w, self.h)
+        if not self.note:
+            over.put(rounded(self.w, self.h, 32, (0, 0, 0), border=th["card_border"], bw=3, alpha=0.0), 0, 0)
+        if credit:
+            ct = text(credit, 24, th, weight="bold", fill=th["muted"] if self.note else (235, 235, 235), max_w=self.w - 40)
+            if self.note:
+                over.put(ct, self.w - ct.w - 16, self.h - ct.h - 2)
+            else:
+                over.put(rounded(ct.w + 8, ct.h, 10, (0, 0, 0), alpha=0.55), self.w - ct.w - 30, self.h - ct.h - 18)
+                over.put(ct, self.w - ct.w - 26, self.h - ct.h - 18)
+        self.over = over.img()
         self.dur = max(0.5, timing.duration)
 
     def state(self, t):
@@ -1090,16 +1503,17 @@ class ImageCard(Card):
         import cv2
 
         z = 1 + (self.zoom - 1) * clamp01(t / self.dur)
-        cw, ch = self.w * z, self.h * z
+        cw, ch = self.iw * z, self.ih * z
         bh, bw = self.big.shape[:2]
         x0 = (bw - cw) / 2
         y0 = (bh - ch) / 2
-        m = np.array([[cw / self.w, 0, x0], [0, ch / self.h, y0]], np.float32)
-        crop = cv2.warpAffine(self.big, m, (self.w, self.h), flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP)
+        m = np.array([[cw / self.iw, 0, x0], [0, ch / self.ih, y0]], np.float32)
+        crop = cv2.warpAffine(self.big, m, (self.iw, self.ih), flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP)
         img = Img(crop * self.mask, self.mask.copy())
         c = Canvas(self.w, self.h)
-        c.put(img, 0, 0)
-        c.put(self.border, 0, 0)
+        c.put(self.under, 0, 0)
+        c.put(img, self.ox, self.oy)
+        c.put(self.over, 0, 0)
         return c.img()
 
 
@@ -1110,7 +1524,7 @@ class TextCard(Card):
         super().__init__(spec, th, timing)
         self.w = CARD_W
         self.title = text(spec.get("title", ""), 64, th, max_w=self.w - 100) if spec.get("title") else None
-        self.body = [text(ln, 50, th, fill=(220, 220, 224), max_w=self.w - 100) for ln in spec.get("lines") or []]
+        self.body = [text(ln, 50, th, fill=th["body"], max_w=self.w - 100) for ln in spec.get("lines") or []]
         self.h = 70 + (self.title.h + 20 if self.title else 0) + sum(b.h + 8 for b in self.body) + 40
         self.bg = self.box(self.w, int(self.h), accent=spec.get("accent_border", False))
         defaults = [0.25 + 0.35 * i for i in range(len(self.body))]
@@ -1145,6 +1559,9 @@ CARD_TYPES = {
 
 
 def make_card(spec: dict, th: dict, timing, base_dir: Path | None = None) -> Card:
+    from .notecards import NOTE_CARDS
+
+    CARD_TYPES.update(NOTE_CARDS)
     kind = (spec or {}).get("type", "text")
     cls = CARD_TYPES.get(kind)
     if cls is None:
@@ -1165,22 +1582,31 @@ class Pills:
         self.sfx_events = []
         order = ["tl", "tr", "bl", "br", "t", "b"]
         defaults = [0.3 + 0.35 * i for i in range(len(items))]
+        note = is_note(th)
+        colors = list((th.get("sticky") or {}).values()) or [th["pill"]]
         for i, it in enumerate(items):
             it = it if isinstance(it, dict) else {"text": str(it)}
-            txt = text(it.get("text", ""), 38, th)
+            txt = text(it.get("text", ""), 38, th, fill=th["text"] if note else th.get("pill_text"))
             ic = icon(it.get("icon"), 40, th)
             w = txt.w + (ic.w + 10 if ic else 0) + 44
             h = max(txt.h, 40) + 22
-            c = Canvas(w, h)
-            c.put(rounded(w, h, h / 2, (26, 26, 28), border=(70, 70, 76), bw=2), 0, 0)
-            x = 22
+            if note:  # 노트: 작은 포스트잇 꼬리표, 조금씩 비뚤게
+                c = Canvas(w + STICKY_PAD * 2, h + STICKY_PAD * 2)
+                c.put(Img.from_pil(sticky_pil(w, h, col(th, it.get("color"), "highlight") if it.get("color") else colors[i % len(colors)], seed=i, with_tape=False)), 0, 0)
+                ox = oy = STICKY_PAD
+            else:
+                c = Canvas(w, h)
+                c.put(rounded(w, h, h / 2, th["pill"], border=th["pill_border"], bw=2), 0, 0)
+                ox = oy = 0
+            x = 22 + ox
             if ic:
-                c.put(ic, x, (h - ic.h) / 2)
+                c.put(ic, x, oy + (h - ic.h) / 2)
                 x += ic.w + 10
-            c.put(txt, x, (h - txt.h) / 2)
+            c.put(txt, x, oy + (h - txt.h) / 2)
+            img = c.img().rotated((-3, 2.5, -2, 3)[i % 4]) if note else c.img()
             pos = it.get("pos", order[i % len(order)])
             when = timing.at(it.get("at"), defaults[i])
-            self.items.append((c.img(), self.POS.get(pos, (0.5, 1.0)) if isinstance(pos, str) else tuple(pos), when, i))
+            self.items.append((img, self.POS.get(pos, (0.5, 1.0)) if isinstance(pos, str) else tuple(pos), when, i))
             self.sfx_events.append(("pop", when))
 
     def draw(self, canvas: Canvas, box: tuple, t: float) -> None:
@@ -1202,10 +1628,20 @@ class Stamp:
     def __init__(self, spec: dict, th: dict, timing):
         d_ = int(spec.get("size", 300))
         c = Canvas(d_, d_)
-        c.put(disc(d_, (16, 30, 10), ring=th["accent"], rw=10), 0, 0)
-        txt = text(spec.get("text", "끝!"), int(d_ * 0.2), th, weight="black", fill=th["accent"], accent=th["text"], max_w=int(d_ * 0.78))
-        c.put(txt, (d_ - txt.w) / 2, (d_ - txt.h) / 2)
-        self.img = c.img().rotated(float(spec.get("angle", 14)))
+        if is_note(th):  # 노트: 빨간 인주 도장 (얼룩진 잉크)
+            ring = disc(d_, None, ring=th["stamp_ring"], rw=9)
+            inner = disc(d_ - 34, None, ring=th["stamp_ring"], rw=4)
+            c.put(ring, 0, 0)
+            c.put(inner, 17, 17)
+            txt = text(spec.get("text", "끝!"), int(d_ * 0.2), th, weight="black", fill=th["stamp_text"], accent=th["stamp_text"], mark="color", max_w=int(d_ * 0.72))
+            c.put(txt, (d_ - txt.w) / 2, (d_ - txt.h) / 2)
+            pil = Image.fromarray(np.dstack([c.pm[..., ::-1] / np.maximum(c.a, 1e-6), c.a * 255]).clip(0, 255).astype(np.uint8), "RGBA")
+            self.img = Img.from_pil(inkify(pil, seed=d_)).rotated(float(spec.get("angle", -12)))
+        else:
+            c.put(disc(d_, th["stamp_fill"], ring=th["stamp_ring"], rw=10), 0, 0)
+            txt = text(spec.get("text", "끝!"), int(d_ * 0.2), th, weight="black", fill=th["stamp_text"], accent=th["text"], max_w=int(d_ * 0.78))
+            c.put(txt, (d_ - txt.w) / 2, (d_ - txt.h) / 2)
+            self.img = c.img().rotated(float(spec.get("angle", 14)))
         self.pos = spec.get("pos", [0.78, 0.72])
         self.when = timing.at(spec.get("at"), max(0.4, timing.duration * 0.6))
         self.sfx_events = [("ding", self.when)]

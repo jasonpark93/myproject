@@ -73,11 +73,21 @@ def test_caption_list_uses_script_text():
     {"type": "comment", "keyword": "청약", "dm": "자료 보냈어요", "items": ["체크리스트"]},
     {"type": "waveform", "marks": [{"label": "틀린 부분"}, {"label": "공백"}], "cut_at": "x"},
     {"type": "steps", "title": "3단계", "steps": ["찍기", "넣기", "말하기"]},
-    {"type": "stat", "label": "아끼는 돈", "value": 3000, "unit": "만 원"},
+    {"type": "stat", "label": "아끼는 돈", "value": 3000, "unit": "만 원", "sticker": "money"},
     {"type": "text", "title": "제목", "lines": ["한 줄", "두 줄"]},
+    {"type": "checklist", "mark": "x", "title": "해지하면 [[0]]", "items": [{"text": "가입 기간", "sub": "1순위 조건"}, "납입 횟수"]},
+    {"type": "hook", "top": "잠깐!", "object": "passbook", "lines": ["돈으로도 못 사는 게", "[[사라져요]]"], "crack_at": "x"},
+    {"type": "hook", "object": "house", "lines": ["[[집값]]"]},
+    {"type": "chart", "title": "가입자", "sticker": "down", "points": [{"x": "22", "v": 2860, "label": "2,860만"}, {"x": "25", "v": 2637}, {"x": "26", "v": 2574, "label": "2,574만"}], "badge": "1년 새\n-63만", "source": "출처"},
+    {"type": "chart", "points": [{"x": "a", "v": 1}, {"x": "b", "v": 3}], "badge": "올랐어요"},
+    {"type": "stack", "title": "가점 84점", "total": 84, "parts": [{"label": "무주택", "value": 32}, {"label": "부양가족", "value": 35}, {"label": "통장", "value": 17, "focus": True}], "note": "깨면 1점부터", "sub": "15년 이상 17점"},
+    {"type": "phone", "rows": [{"k": "상품", "v": "청약"}], "from": "100,000원", "to": "20,000원", "hint": "월 2만~50만 원", "toast": "변경 완료", "note": "그대로 쌓여요"},
+    {"type": "notes", "title": "[[혜택]]", "notes": [{"head": "소득공제", "big": "최대 120만 원", "small": "무주택 세대주", "sticker": "money"}, {"head": "청년", "big": "4.5%", "color": "mint"}]},
+    {"type": "cta", "lines": ["깨기 전에", "[[꼭 다시 보기]]"], "question": "어느 쪽?", "options": ["유지파", "해지파"]},
 ])
-def test_every_card_draws(spec):
-    th = cards.theme()
+@pytest.mark.parametrize("theme", ["note", "neon"])
+def test_every_card_draws(spec, theme):
+    th = cards.theme(theme)
     card = cards.make_card(spec, th, FakeTiming())
     sizes = set()
     for t in (0.0, 0.3, 1.0, 2.9):
@@ -93,15 +103,55 @@ def test_image_card_and_overlays(tmp_path):
 
     path = tmp_path / "shot.png"
     Image.new("RGB", (600, 900), (200, 50, 50)).save(path)
-    th = cards.theme()
-    card = cards.make_card({"type": "image", "path": "shot.png"}, th, FakeTiming(), base_dir=tmp_path)
-    assert card.frame(1.0).h <= 760
-    canvas = cards.Canvas(1080, 1200)
-    cards.Pills([{"text": "컷 편집", "icon": "cut"}, {"text": "자막", "pos": "br"}], th, FakeTiming()).draw(canvas, (90, 200, 900, 600), 2.0)
-    cards.Stamp({"text": "끝!", "at": None}, th, FakeTiming()).draw(canvas, (90, 200, 900, 600), 2.9)
-    assert canvas.a.max() > 0.9
-    for name in cards.ICONS:
-        assert cards.icon(name, 48, th).w == 48
+    from editor.notecards import Stickers
+
+    for theme in ("note", "neon"):
+        th = cards.theme(theme)
+        card = cards.make_card({"type": "image", "path": "shot.png", "caption": "과천 한 단지", "credit": "사진: 나"}, th, FakeTiming(), base_dir=tmp_path)
+        assert card.frame(1.0).h <= 760
+        assert card.paper == (theme == "note")  # 노트 테마는 폴라로이드(그림자·테이프)
+        canvas = cards.Canvas(1080, 1200)
+        cards.Pills([{"text": "컷 편집", "icon": "cut"}, {"text": "자막", "pos": "br"}], th, FakeTiming()).draw(canvas, (90, 200, 900, 600), 2.0)
+        cards.Stamp({"text": "끝!", "at": None}, th, FakeTiming()).draw(canvas, (90, 200, 900, 600), 2.9)
+        Stickers([{"name": "fire", "at": None}], th, FakeTiming()).draw(canvas, (90, 200, 900, 600), 2.0)
+        assert canvas.a.max() > 0.9
+        for name in cards.ICONS:
+            assert cards.icon(name, 48, th).w == 48
+
+
+def test_stickers_local_and_missing(monkeypatch):
+    from editor import stickers
+
+    img = cards.sticker("money", 120)
+    assert img is not None and img.w > 120  # 흰 테두리 + 그림자 여백
+
+    def offline(*a, **k):
+        raise OSError("오프라인")
+
+    monkeypatch.setattr(stickers.urllib.request, "urlopen", offline)
+    assert stickers.path("없는-스티커-이름") is None
+    assert cards.sticker("없는-스티커-이름", 100) is None
+
+
+def test_note_look_frames():
+    from editor import motion
+
+    nar = fake_narration()
+    timings = story.schedule(SPEC, nar)
+    th = cards.theme("note")
+    spec = dict(SPEC, brand="돈한입", header={"tag": "EP.1", "title": "청약 [[꿀팁]]"})
+    scenes = motion.build_scenes(spec, th, timings, None)
+    caps = story.caption_list(spec, nar, 12)
+    look = motion.make_look(spec, th, scenes, caps)
+    assert isinstance(look, motion.NoteLook)
+    bg = look.bg
+    first = look.frame(0)
+    assert first.shape == (1920, 1080, 3)
+    assert np.abs(first[120:360].astype(int) - bg[120:360]).mean() > 1  # 첫 화면부터 제목이 보인다
+    switch = int(timings[1].start * 30)
+    for j in (switch + 2, switch + 20):  # 장면이 바뀌며 밀려 들어오는 중에도 문제없이 그린다
+        assert look.frame(j).shape == (1920, 1080, 3)
+    assert isinstance(motion.make_look(spec, cards.theme("neon"), scenes, caps), motion.NeonLook)
 
 
 def test_unknown_card_type_is_clear_error():
@@ -112,12 +162,13 @@ def test_unknown_card_type_is_clear_error():
 
 
 @needs_ffmpeg
-def test_story_render_with_fake_voice(tmp_path, monkeypatch):
+@pytest.mark.parametrize("theme", ["note", "neon"])
+def test_story_render_with_fake_voice(tmp_path, monkeypatch, theme):
     from editor import motion, tts
 
     stories = tmp_path / "stories"
     stories.mkdir()
-    spec = dict(SPEC, upload={"titles": ["청약 꿀팁"], "description": "설명", "hashtags": ["#쇼츠"]})
+    spec = dict(SPEC, theme=theme, upload={"titles": ["청약 꿀팁"], "description": "설명", "hashtags": ["#쇼츠"]})
     (stories / "t.json").write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
     monkeypatch.setattr(story, "STORIES", stories)
     monkeypatch.setattr(motion, "OUT_DIR", tmp_path / "out")

@@ -66,6 +66,16 @@ def doctor(log=print) -> int:
         ok("자막 글꼴(Pretendard)")
     else:
         bad("자막 글꼴이 없습니다", "저장소를 다시 받거나 reels/fonts/ 에 굵은 한글 글꼴(.otf/.ttf)을 넣으세요")
+    if (ROOT / "fonts" / "NanumPenScript-Regular.ttf").exists():
+        ok("손글씨 글꼴(나눔손글씨 펜)")
+    else:
+        bad("손글씨 글꼴이 없습니다", "저장소를 다시 받으세요 (reels/fonts/NanumPenScript-Regular.ttf)")
+    stickers_dir = ROOT / "assets" / "stickers"
+    count = len(list(stickers_dir.glob("*.png"))) if stickers_dir.exists() else 0
+    if count:
+        ok(f"그림 스티커 {count}개 (없는 그림은 처음 쓸 때 내려받음)")
+    else:
+        bad("그림 스티커가 없습니다", "저장소를 다시 받으세요 (reels/assets/stickers/) — 없어도 영상은 만들어지고 스티커만 빠집니다")
     log("")
     log("모두 준비됐습니다." if problems == 0 else f"고칠 것 {problems}개 — 위 명령을 실행한 뒤 다시 점검하세요.")
     return 0 if problems == 0 else 1

@@ -1,6 +1,6 @@
-"""효과음: 휙(whoosh)·띵(ding)·뽁(pop).
+"""효과음: 휙(whoosh)·띵(ding)·뽁(pop)·쩍(crack, 깨질 때)·톡(tap, 화면 누를 때).
 
-reels/sfx/ 에 whoosh.wav, ding.wav, pop.wav(또는 mp3·m4a)를 넣으면 그 파일을 쓰고, 없으면 여기서 직접 만든다.
+reels/sfx/ 에 whoosh.wav, ding.wav, pop.wav, crack.wav, tap.wav(또는 mp3·m4a)를 넣으면 그 파일을 쓰고, 없으면 여기서 직접 만든다.
 효과음은 목소리보다 작게, 10초에 최대 3개까지만 (많으면 싸구려처럼 들린다).
 """
 
@@ -13,11 +13,11 @@ import numpy as np
 from . import ROOT, SR
 from .media import decode_audio
 
-KINDS = ("whoosh", "ding", "pop")
-LABEL = {"whoosh": "휙", "ding": "띵", "pop": "뽁"}
-PRIORITY = {"whoosh": 0, "ding": 1, "pop": 2}
+KINDS = ("whoosh", "ding", "pop", "crack", "tap")
+LABEL = {"whoosh": "휙", "ding": "띵", "pop": "뽁", "crack": "쩍", "tap": "톡"}
+PRIORITY = {"crack": 0, "whoosh": 0, "ding": 1, "tap": 1, "pop": 2}
 # 목소리(말하는 부분 평균)보다 몇 dB 작게 넣을지
-UNDER_VOICE_DB = {"whoosh": 9.0, "ding": 11.0, "pop": 8.0}
+UNDER_VOICE_DB = {"whoosh": 9.0, "ding": 11.0, "pop": 8.0, "crack": 6.0, "tap": 9.0}
 PEAK_CAP_DB = -6.0  # 효과음 순간 최대치가 이보다 크지 않게 (짧은 '뽁'이 귀를 찌르지 않도록)
 SFX_DIR = ROOT / "sfx"
 EXTS = (".wav", ".mp3", ".m4a", ".aac", ".aif", ".aiff", ".ogg", ".flac")
@@ -78,9 +78,37 @@ def synth_pop(sr: int = SR) -> np.ndarray:
     return _normalize(body + click)
 
 
-SYNTH = {"whoosh": synth_whoosh, "ding": synth_ding, "pop": synth_pop}
+def synth_crack(sr: int = SR) -> np.ndarray:
+    """무언가 '쩍' 갈라지는 소리: 날카로운 잡음 터짐 + 낮은 쿵 + 잔금 가는 자글거림."""
+    rng = np.random.default_rng(11)
+    n = int(0.42 * sr)
+    t = np.arange(n) / sr
+    burst = rng.standard_normal(n) * np.exp(-t / 0.018)
+    burst = np.diff(burst, prepend=0.0)  # 고음 위주(날카롭게)
+    thump = np.sin(2 * np.pi * (95 + 60 * np.exp(-t / 0.02)) * t) * np.exp(-t / 0.07) * 0.9
+    crackle = np.zeros(n)
+    for _ in range(26):  # 잔금: 작은 딸깍들이 0.25초 동안 흩어짐
+        at = int(rng.uniform(0.005, 0.25) * sr)
+        m = int(0.003 * sr)
+        if at + m < n:
+            crackle[at : at + m] += rng.standard_normal(m) * np.linspace(1, 0, m) * rng.uniform(0.2, 0.7) * np.exp(-at / sr / 0.15)
+    sig = burst * 1.2 + thump + crackle
+    sig *= 1 - np.exp(-t / 0.0006)
+    return _normalize(sig)
+
+
+def synth_tap(sr: int = SR) -> np.ndarray:
+    """화면을 '톡' 누르는 소리: 아주 짧은 딸깍 + 높은 틱."""
+    n = int(0.08 * sr)
+    t = np.arange(n) / sr
+    click = np.random.default_rng(5).standard_normal(n) * np.exp(-t / 0.0025)
+    tick = np.sin(2 * np.pi * 2300 * t) * np.exp(-t / 0.012) * 0.6
+    return _normalize(np.diff(click, prepend=0.0) + tick)
+
+
+SYNTH = {"whoosh": synth_whoosh, "ding": synth_ding, "pop": synth_pop, "crack": synth_crack, "tap": synth_tap}
 # 소리 안에서 '터지는' 순간(초): 화면 변화와 이 순간을 맞춘다
-SYNTH_HIT = {"whoosh": 0.30, "ding": 0.0, "pop": 0.0}
+SYNTH_HIT = {"whoosh": 0.30, "ding": 0.0, "pop": 0.0, "crack": 0.0, "tap": 0.0}
 
 
 def user_file(kind: str, folder: Path = SFX_DIR):

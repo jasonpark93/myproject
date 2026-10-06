@@ -1,8 +1,17 @@
 # 모션그래픽 릴스 만들기 (Claude용 작성 지침)
 
 얼굴 없이 **목소리 + 움직이는 카드**로 만드는 설명형 릴스.
-화면 구성은 검정 배경, 상단 고정 제목(형광 연두), 가운데 카드, 하단 자막이다.
 사용자는 대본을 소리 내어 녹음만 하면 되고, 나머지(대본·장면 설계·렌더)는 Claude가 한다.
+
+## 디자인 (theme)
+- **`note` (기본, 채널 고유 디자인 '돈한입 노트')**
+  - 모눈 노트 배경, 위에 채널 이름표 + 회차 꼬리표 + 제목(형광펜이 쓱 칠해짐), 장면 진행 막대.
+  - 카드는 종이(그림자·마스킹 테이프·살짝 기울임)이고, 오른쪽에서 밀려 들어와 왼쪽으로 빠진다.
+  - 강조는 노란 형광펜, 틀린 것·중요한 것은 빨간 펜(동그라미·X·취소선·손글씨), 정보는 포스트잇.
+  - 그림은 다꾸 스티커(3D 그림 + 흰 테두리)와 코드로 그린 그림(청약통장 등).
+  - 자막은 먹색 라벨 위 흰 글씨, 강조 단어는 노랑.
+- `neon`: 참고 릴스와 비슷한 검정 배경 + 형광 연두. 비교·예시용이다. 올릴 영상에는 쓰지 않는다(남의 디자인과 비슷해짐).
+- 새 영상은 `note`로 만든다. 다른 사람 영상의 색·배치·카드 모양을 그대로 따라 하지 않는다.
 
 ## 흐름
 0. **잘 되는 쇼츠 조사**: 주제가 정해지면 먼저 최근 30일 사이 조회수가 높은 쇼츠의 '제작 공식'을 뽑는다. 방법은 아래 '조사' 절에 있다.
@@ -44,21 +53,23 @@
   - 문장·예시·영상·음원·캐릭터는 가져오지 않는다.
   - 같은 형식을 찍어내듯 대량으로 만들지 않는다. 매 영상에 새 정보와 내 목소리가 들어가야 유튜브 '재사용·대량생산 콘텐츠' 정책에 걸리지 않는다.
 
-## 대본 구성 (참고 릴스에서 검증된 순서, 25~40초)
+## 대본 구성 (정보형 쇼츠, 35~45초)
 
 | 순서 | 역할 | 길이 | 잘 맞는 카드 |
 | --- | --- | --- | --- |
-| 1 | **훅**: 결과·이득을 먼저 말한다 ("~할 필요 없습니다", "~모르면 손해") | 2~3초 | bigtext (+ pills / stamp) |
-| 2 | 증거·신뢰 ("지금 보고 계신 이 영상도…") | 3초 | stat, image |
-| 3 | 쉬움 강조 ("방법도 진짜 간단해요") | 2초 | bigtext + pill |
-| 4 | 방법 1~3단계 | 3~4초 | steps (+ stamp "끝!") |
-| 5 | 기능·혜택 목록 | 4초 | checklist (말할 때마다 체크) |
-| 6 | 고통 제거 (귀찮은 것, 손해 보는 것) | 4초 | waveform, compare |
-| 7 | 결과 (시간·돈 절약 → 꾸준함) | 4초 | compare, calendar, stat |
-| 8 | **CTA**: "댓글에 '키워드' 남기시면 ○○ 보내드릴게요" | 4~5초 | comment |
+| 1 | **훅**: 멈추게 하는 한마디 + 궁금증 ("잠깐, ○○하려고요? ○○하는 순간 △△이 사라져요") | 2~4초 | hook (그림이 깨지거나 쾅 찍힘) |
+| 2 | 지금 이 얘기를 하는 이유 (최신 숫자·뉴스) | 3~4초 | chart, stat |
+| 3 | 궁금증의 답 + 핵심 원리 | 5~7초 | stack, bigtext |
+| 4 | 자세한 정보 (사라지는 것·조건·주의점) | 4~6초 | checklist(`mark: x`), notes |
+| 5 | 실제 사례 (돈·시세) | 5~6초 | compare, image(사진) |
+| 6 | **바로 따라 할 수 있는 방법** | 5~7초 | phone(앱 화면), steps |
+| 7 | 챙길 혜택·조건 | 5~7초 | notes, checklist |
+| 8 | **CTA**: 저장 + 의견 묻기 ("깨기 전에 다시 보게 저장해 두세요. 여러분은?") | 4~5초 | cta, comment |
 
 규칙
-- 장면 하나 = 한두 문장 = 2~5초. 장면은 8~10개.
+- 훅은 첫 2초 안에 '멈출 이유'를 준다: 손해·궁금증·반전 중 하나. 첫 화면(0초)에도 제목과 그림이 보여야 한다.
+- 정보는 '보는 사람이 바로 써먹을 수 있게' 쓴다: 조건(나이·소득), 숫자(최대 얼마), 방법(어디서 무엇을 누르나), 출처.
+- 장면 하나 = 한두 문장 = 3~7초. 장면은 7~9개.
 - 문장은 짧고 말하듯이 쓴다. 한 문장은 25자 이내가 좋다.
 - 첫 문장은 2초 안에 핵심을 말한다. 인사나 자기소개로 시작하지 않는다.
 - 숫자·돈·제도 이야기는 사실만 쓴다. 확실하지 않으면 사용자에게 확인한다. 과장·허위 약속은 금지.
@@ -67,17 +78,21 @@
 ## 파일 형식
 ```json
 {
-  "header": {"label": "요즘 해외에서 난리난", "title": "클로드 영상 자동편집"},
+  "theme": "note",
+  "brand": "돈한입",
+  "header": {"tag": "청약 EP.1", "title": "청약통장 [[깨기 전에]]"},
   "scenes": [
-    {"say": "읽을 말. [[강조]]는 자막에서 연두색", "card": {"type": "...", ...}, "pills": [...], "stamp": {...}}
+    {"say": "읽을 말. [[강조]]는 자막에서 강조색", "card": {"type": "...", ...}, "stickers": [...], "stamp": {...}}
   ],
   "settings": {"sfx": {"max_per_10s": 4, "volume": 1.0}},
   "upload": {"titles": ["제목1", "제목2", "제목3"], "pick": 0, "description": "설명 2~3줄", "hashtags": ["#쇼츠", "#청약", "#내집마련", "#재테크", "#청약통장"]},
   "bgm": "음악 파일 경로 (생략하면 reels/bgm/의 첫 파일, false면 없음)"
 }
 ```
-- header.label: 작은 글씨, 맥락을 담는다(예: "모르면 손해", "1분 정리", "요즘 난리난"). 15자 이내.
-- header.title: 큰 연두 글씨, 주제 키워드. 10자 안팎. 영상 내내 보인다.
+- brand: 채널 이름표(노트 테마). 사용자가 정한 채널 이름을 쓴다. `brand_sticker`로 이름표 옆 그림을 바꿀 수 있다(기본 coin).
+- header.tag: 회차·분류 꼬리표(예: "청약 EP.1"). neon 테마에서는 header.label이 작은 글씨 줄이다.
+- header.title: 큰 제목, 주제 키워드. 10자 안팎. `[[ ]]` 부분에 형광펜이 칠해진다. 영상 내내 보인다.
+- header.progress: 장면 진행 막대 (기본 true, 끄려면 false).
 - `at`: 카드 안에서 그 말이 나올 때 애니메이션(체크·등장)이 일어난다.
   - say에 있는 말을 그대로 쓴다. 띄어쓰기·문장부호는 무시된다.
   - 없으면 장면 안에 고르게 배치된다.
@@ -106,17 +121,43 @@
 | `stat` | 큰 숫자 카운트업 | `value` | `label`, `unit`("만 원", "%"), `prefix`, `decimals`, `sub`, `at`, `count`(초) |
 | `waveform` | 문제 구간 표시 → 잘라냄 | `marks`: [{"label","at"}] | `title`, `cut_at` |
 | `comment` | 댓글 CTA + 자료 DM | `keyword` | `lead`("댓글에"), `type_at`, `dm`("○○님이 자료를 보냈어요"), `dm_at`, `items`: [{"text","at"}] |
-| `image` | 캡처 화면·사진 | `path` (스토리 파일 기준 상대경로 가능) | `zoom`(1.06), `max_h` |
+| `image` | 캡처 화면·사진 | `path` (스토리 파일 기준 상대경로 가능) | `zoom`(1.06), `max_h`, `caption`(폴라로이드 아래 손글씨), `credit`(출처, 사진을 가져왔으면 필수) |
 | `text` | 그 밖의 설명 | — | `title`, `lines` |
+| `hook` | 첫 2초 훅 | `lines`: ["돈으로도 못 사는 게", "[[사라져요]]"] | `top`(손글씨 "잠깐!"), `object`("passbook"=청약통장 그림, 또는 스티커 이름), `crack_at`(통장이 쩍 갈라짐+화면 흔들림), `since`·`count`(통장에 적힌 글), `at`(줄마다), `size` |
+| `chart` | 꺾은선 그래프 (추세) | `points`: [{"x":"2022.6","v":2860,"label":"2,860만","note":"손글씨"}] | `title`, `sticker`, `pos`(점의 가로 위치 0~1), `range`([최소, 최대]), `at`(선 그리기 시작), `draw`(초), `badge`("1년 새\n-63만 명"), `badge_at`, `badge_pos`(tl/tr/bl/br), `source`(출처), `color` |
+| `stack` | 합계를 나눈 막대 (가점 84 = 32+35+17) | `parts`: [{"label","value","focus","at"}] | `title`, `sticker`, `total`, `unit`("점"), `note`(빨간 손글씨)·`note_at`, `sub` |
+| `phone` | 앱에서 바꾸는 방법 (일반 은행 앱 모양) | `from`, `to` (바뀌는 금액) | `screen`(화면 제목), `rows`: [{"k","v"}], `field`, `hint`, `change_at`, `button`, `tap_at`, `toast`, `note`(옆 포스트잇)·`note_at` |
+| `notes` | 포스트잇 2~3장 (혜택·조건) | `notes`: [{"head","big","small","color"(yellow/mint/pink/blue),"sticker","at"}] | `title`, `note_h` |
+| `cta` | 저장 + 투표 마무리 | `lines` | `at`, `save_at`(저장 버튼 톡), `question`(손글씨), `question_at`, `options`(["유지파","해지파"]), `options_at` |
+
+카드 공통 선택 항목
+- `sticker`: 카드 제목 옆 그림 (checklist·steps·compare·chart·stack, stat은 숫자 옆).
+- checklist: `mark: "x"`면 빨간 펜 X + 취소선(사라지는 것·하면 안 되는 것). 항목마다 `sub`(작은 설명), `sticker`.
+- compare: `source`(출처 작은 글씨).
 
 장면에 얹는 것
-- `pills`: 카드 주변에 떠 있는 꼬리표.
+- `stickers`: 카드 위에 '착' 붙는 다꾸 스티커.
+  - 예: [{"name":"bulb","pos":[0.05,0.04],"size":140,"at":"부담되면","angle":-10}] (pos는 카드 기준 비율)
+- `pills`: 카드 주변에 떠 있는 꼬리표(노트 테마는 작은 포스트잇).
   - 예: [{"text":"컷 편집","icon":"cut","pos":"tl","at":"..."}]
   - pos는 tl, tr, bl, br, t, b 중 하나.
-- `stamp`: 쿵 찍히는 도장.
+- `stamp`: 쿵 찍히는 도장(노트 테마는 빨간 인주 도장).
   - 예: {"text":"직접 편집\n필요없음","at":"...","size":300,"pos":[0.78,0.72]}
 
-아이콘 이름 (직접 그린 단순 아이콘):
+스티커 이름 (Microsoft Fluent 이모지 3D, MIT 라이선스 — 상업 이용 가능, 설명란 출처 표기 권장)
+- `reels/assets/stickers/`에 있는 것: `house houses apartment money coin cash flying_money down up hammer phone bank calendar hourglass clock bulb warning stop check x pin memo bookmark key gift think scream sparkles alert fire party receipt lock`
+- 목록에 없는 것도 Fluent 이모지 영어 이름("Money with wings")으로 쓰면 처음 한 번 내려받는다(인터넷 필요).
+
+사진 (보는 사람이 실제로 알아보게 하는 그림)
+- 넣는 곳: `reels/stories/assets/스토리이름/` → card `{"type":"image","path":"assets/스토리이름/파일.jpg","caption":"과천 ○○ 단지","credit":"사진: 출처"}`
+- 쓸 수 있는 것:
+  - 사용자가 직접 찍은 사진, 앱·누리집 화면 캡처(이름·계좌·전화번호는 가리기)
+  - 무료 사진 사이트(Unsplash·Pexels·Pixabay)는 각 사이트 라이선스 확인 후 사용
+  - 공공누리 1유형 사진(출처 표시)
+- 가져온 사진은 credit에 출처를 쓰고 upload 설명에도 적는다. 출처를 모르는 인터넷 사진·다른 사람 영상 캡처는 쓰지 않는다.
+- 클라우드 작업 환경에서는 사진 사이트 접속이 막혀 있을 수 있다. 그때는 사용자에게 사진을 부탁하거나 스티커·그림 카드로 대신한다.
+
+아이콘 이름 (직접 그린 단순 아이콘, 스티커가 없을 때):
 `spark zoom sound caption bolt cut clock calendar mic pin money chart home heart send mail star fire warning up down x play gift phone user check bank doc`
 
 ## 녹음 요령 (사용자에게 그대로 안내)

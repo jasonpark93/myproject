@@ -169,6 +169,40 @@ def caption_sprite(text: str, highlights: list, style: dict, pop: bool = True) -
     return Sprite(rgba, cx, cy, pop=pop)
 
 
+def pill_caption_sprite(text: str, highlights: list, style: dict, pop: bool = True) -> Sprite:
+    """노트 테마 자막: 먹색 라벨(둥근 띠) 위 흰 글씨, 강조 단어는 형광 노랑."""
+    size = int(round(68 * float(style.get("size", 1.0))))
+    max_width = int(style.get("max_width", 940))
+    fnt = font(size, style.get("font") or None)
+    padx, pady = 34, 14
+    width = fnt.getlength(text)
+    if width + padx * 2 > max_width:
+        size = max(int(size * 0.62), int(size * (max_width - padx * 2) / width))
+        fnt = font(size, style.get("font") or None)
+        width = fnt.getlength(text)
+    ascent, descent = fnt.getmetrics()
+    m = 16  # 그림자 여백
+    w, h = int(width) + padx * 2, ascent + descent + pady * 2
+    bg = tuple(style.get("bg", (28, 26, 23)))
+    base = Image.new("RGBA", (w + m * 2, h + m * 2), (0, 0, 0, 0))
+    sh = Image.new("L", base.size, 0)
+    ImageDraw.Draw(sh).rounded_rectangle([m, m + 6, m + w, m + h + 6], radius=24, fill=70)
+    shadow = Image.new("RGBA", base.size, (40, 30, 20, 0))
+    shadow.putalpha(sh.filter(ImageFilter.GaussianBlur(7)))
+    base = Image.alpha_composite(base, shadow)
+    pill = Image.new("RGBA", (w * 3, h * 3), (0, 0, 0, 0))
+    ImageDraw.Draw(pill).rounded_rectangle([0, 0, w * 3 - 1, h * 3 - 1], radius=24 * 3, fill=bg + (244,))
+    pill = pill.resize((w, h), Image.LANCZOS)
+    base.alpha_composite(pill, (m, m))
+    d = ImageDraw.Draw(base)
+    x = m + padx
+    fill, accent = color(style.get("color", "#FFFFFF")), color(style.get("highlight", "#FFDE40"))
+    for part, hl in runs(text, highlights):
+        d.text((x, m + pady), part, font=fnt, fill=(accent if hl else fill) + (255,))
+        x += fnt.getlength(part)
+    return Sprite(np.asarray(base), W / 2 - 14, style["center_y"], pop=pop)
+
+
 _MARK = re.compile(r"\[\[(.+?)\]\]")
 
 

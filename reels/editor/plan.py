@@ -149,17 +149,7 @@ def resolve(plan: dict, env) -> Resolved:
             caps.append({"sentence": s["id"], "text": text, "hl": [h for h in hl if h and h in text], "t0": times[0], "t1": times[1]})
         sentences.append(info)
 
-    caps.sort(key=lambda c: c["t0"])
-    for i, cap in enumerate(caps):  # 다음 자막이 뜰 때까지 유지 (깜빡임 방지)
-        nxt = caps[i + 1]["t0"] if i + 1 < len(caps) else None
-        end = cap["t1"] + 0.3
-        if nxt is not None and nxt - cap["t1"] < 0.6:
-            end = nxt
-        if nxt is not None:
-            end = min(end, nxt)
-        cap["show"] = [round(cap["t0"], 3), round(min(tl.duration, max(end, cap["t0"] + 0.2)), 3)]
-    if caps and caps[0]["t0"] < 0.6:  # 첫 화면부터 자막이 보이게 (피드에서 멈추게 하는 첫 프레임)
-        caps[0]["show"][0] = 0.0
+    captions.schedule(caps, tl.duration)
 
     kinds = zoom.resolve_types(sentences, settings["zoom"])
     for info, kind in zip(sentences, kinds):

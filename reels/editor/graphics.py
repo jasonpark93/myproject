@@ -63,6 +63,17 @@ def _system_font(size: int):
     return None
 
 
+WEIGHTS = {"black": "Pretendard-Black.otf", "extrabold": "Pretendard-ExtraBold.otf", "bold": "Pretendard-Bold.otf"}
+
+
+def weight_font(size: int, weight: str = "extrabold") -> ImageFont.FreeTypeFont:
+    """번들 Pretendard의 굵기별 글꼴 (없으면 기본 굵은 글꼴)."""
+    path = ROOT / "fonts" / WEIGHTS.get(weight, WEIGHTS["extrabold"])
+    if path.exists():
+        return ImageFont.truetype(str(path), size)
+    return font(size)
+
+
 def font(size: int, path: str | None = None) -> ImageFont.FreeTypeFont:
     for candidate in (path, os.environ.get("REELS_FONT"), str(BUNDLED)):
         if candidate and Path(candidate).exists():

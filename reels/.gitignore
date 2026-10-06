@@ -5,6 +5,8 @@ inbox/*
 !inbox/README.md
 sfx/*
 !sfx/README.md
+bgm/*
+!bgm/README.md
 style.json
 *.mp4
 *.mov

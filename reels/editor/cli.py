@@ -13,6 +13,7 @@
   title 이름 "제목 [[강조]]"         상단 제목 (빈 문자열이면 없앰)
   review 이름                       검토표 다시 만들기
   list                              작업 목록
+  story 이름 [--voice 녹음.m4a]       모션그래픽 릴스 (stories/이름.json: 대본 + 카드)
   ref 영상                          참고 영상(잘 된 릴스) 분석
   sounds                            효과음 미리듣기 파일 만들기
   doctor                            설치 상태 점검
@@ -359,6 +360,13 @@ def main(argv=None) -> int:
     sub.add_parser("doctor")
     p_ref = sub.add_parser("ref", help="참고 영상 분석")
     p_ref.add_argument("video")
+    p_story = sub.add_parser("story", help="모션그래픽 릴스 (목소리 + 카드)")
+    p_story.add_argument("name", help="reels/stories/이름.json")
+    p_story.add_argument("--voice", help="녹음 파일 (생략하면 inbox/이름.m4a 등, 없으면 컴퓨터 음성)")
+    p_story.add_argument("--tts", action="store_true", help="녹음이 있어도 컴퓨터 음성으로 미리보기")
+    p_story.add_argument("--engine", help="컴퓨터 음성 종류: say(Mac) sapi(Windows) edge espeak")
+    p_story.add_argument("--model", help="음성 인식 모델")
+    p_story.add_argument("--out", help="완성본 경로")
 
     args = ap.parse_args(argv)
     try:
@@ -391,6 +399,10 @@ def main(argv=None) -> int:
             from .doctor import doctor
 
             return doctor(log)
+        elif args.cmd == "story":
+            from .motion import render_story
+
+            render_story(args.name, args.voice, args.tts, args.engine, args.out, args.model, log=log)
         elif args.cmd == "ref":
             from .reference import analyze_reference
 

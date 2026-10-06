@@ -129,3 +129,19 @@ def auto_captions(words: list, a: int, b: int, max_chars: int, keywords=(), scri
         if text:
             out.append({"from": first, "to": last, "text": text, "hl": find_highlights(text, keywords)})
     return out
+
+
+def schedule(caps: list, duration: float) -> list:
+    """자막마다 화면에 떠 있을 구간(show)을 정한다: 다음 자막이 뜰 때까지 유지(깜빡임 방지), 첫 자막은 0초부터."""
+    caps.sort(key=lambda c: c["t0"])
+    for i, cap in enumerate(caps):
+        nxt = caps[i + 1]["t0"] if i + 1 < len(caps) else None
+        end = cap["t1"] + 0.3
+        if nxt is not None and nxt - cap["t1"] < 0.6:
+            end = nxt
+        if nxt is not None:
+            end = min(end, nxt)
+        cap["show"] = [round(cap["t0"], 3), round(min(duration, max(end, cap["t0"] + 0.2)), 3)]
+    if caps and caps[0]["t0"] < 0.6:
+        caps[0]["show"][0] = 0.0
+    return caps

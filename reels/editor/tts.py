@@ -12,6 +12,7 @@
 
 from __future__ import annotations
 
+import re
 import shutil
 import sys
 import tarfile
@@ -175,3 +176,70 @@ def pick(engine: str | None = None, voice: str | None = None, log=print) -> str:
 def speak(text: str, engine: str | None = None, voice: str | None = None) -> np.ndarray:
     """한 문장을 읽어 48kHz 모노 float32로 돌려준다 (앞뒤 무음 제거)."""
     return _trim(_synth(pick(engine, voice), text, voice))
+
+
+# ---------- 숫자를 한국어 읽기로 (컴퓨터 음성이 숫자를 이상하게 읽지 않도록) ----------
+_DIGITS = "영일이삼사오육칠팔구"
+_NATIVE = {1: "한", 2: "두", 3: "세", 4: "네", 5: "다섯", 6: "여섯", 7: "일곱", 8: "여덟", 9: "아홉"}
+_NATIVE_TENS = {1: "열", 2: "스물", 3: "서른", 4: "마흔", 5: "쉰", 6: "예순", 7: "일흔", 8: "여든", 9: "아흔"}
+_NATIVE_COUNTERS = ("가지", "개", "명", "번째", "번", "살", "시", "곳", "마리", "권", "잔", "장", "달", "군데", "사람")
+
+
+def _sino_group(n: int) -> str:
+    out = ""
+    for value, unit in ((1000, "천"), (100, "백"), (10, "십")):
+        d = n // value
+        if d:
+            out += ("" if d == 1 else _DIGITS[d]) + unit
+        n %= value
+    if n:
+        out += _DIGITS[n]
+    return out
+
+
+def sino(n: int) -> str:
+    """정수를 한자어 수로: 63 → 육십삼, 300 → 삼백, 10000 → 만"""
+    if n == 0:
+        return "영"
+    parts = []
+    for unit in ("", "만", "억", "조"):
+        n, group = divmod(n, 10000)
+        if group:
+            word = _sino_group(group)
+            if unit == "만" and group == 1:
+                word = ""
+            parts.append(word + unit)
+        if n == 0:
+            break
+    return "".join(reversed(parts))
+
+
+def native(n: int) -> str | None:
+    if not 1 <= n <= 99:
+        return None
+    tens, ones = divmod(n, 10)
+    if tens == 2 and ones == 0:
+        return "스무"
+    return (_NATIVE_TENS.get(tens, "") if tens else "") + (_NATIVE.get(ones, "") if ones else "")
+
+
+def readable(text: str) -> str:
+    """'월 2만 원', '4.5%', '19~34세', '99㎡', '3가지', '2030' → 컴퓨터 음성이 자연스럽게 읽는 글자."""
+    text = text.replace("㎡", " 제곱미터").replace("%", " 퍼센트").replace("↑", "").replace("↓", "")
+    text = re.sub(r"\b(20|30|40|50)(20|30|40|50|60)(?=\s*(세대|대|$|\W))", lambda m: "".join(_DIGITS[int(ch)] if ch != "0" else "공" for ch in m.group(0)), text)
+    text = re.sub(r"(\d+)\s*~\s*(\d+)", r"\1에서 \2", text)
+
+    def number(m):
+        raw = m.group(1).replace(",", "")
+        after = text[m.end():m.end() + 3]
+        if "." in raw:
+            whole, frac = raw.split(".", 1)
+            return sino(int(whole or 0)) + " 점 " + "".join(_DIGITS[int(ch)] for ch in frac)
+        value = int(raw)
+        if after.lstrip().startswith(_NATIVE_COUNTERS):
+            word = native(value)
+            if word:
+                return word + " "
+        return sino(value)
+
+    return re.sub(r"(\d[\d,]*(?:\.\d+)?)", number, text)

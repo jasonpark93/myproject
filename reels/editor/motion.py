@@ -255,7 +255,7 @@ def render_story(ref: str, voice: str | None = None, use_tts: bool = False, engi
     sfx_cfg.update((spec.get("settings") or {}).get("sfx") or {})
     events = sfx_plan(scenes, int(sfx_cfg["max_per_10s"])) if sfx_cfg.get("enabled", True) else []
 
-    video = work / f"video-{stable_hash(PIPELINE, spec, nar.words, nar.duration)}.mp4"
+    video = work / f"video-{stable_hash(PIPELINE, spec, nar.words, nar.duration, [(c['text'], c['hl'], c['show']) for c in caps])}.mp4"
     timings_info = {}
     if not video.exists():
         t = time.time()
@@ -303,7 +303,7 @@ def scene_sheet(video: Path, timings: list, out: Path) -> Path:
 
     frames = []
     for tm in timings:
-        t = tm.start + min(tm.duration * 0.6, max(0.4, tm.duration - 0.3))
+        t = tm.start + max(0.4, tm.duration - 0.35)  # 장면이 끝나기 직전 = 애니메이션이 다 끝난 모습
         data = run([need("ffmpeg"), "-v", "error", "-nostdin", "-ss", f"{t:.2f}", "-i", str(video), "-frames:v", "1", "-vf", "scale=270:480", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"]).stdout
         if len(data) == 270 * 480 * 3:
             frames.append(np.frombuffer(data, np.uint8).reshape(480, 270, 3))

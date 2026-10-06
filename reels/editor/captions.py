@@ -15,13 +15,15 @@ NUM_HL = re.compile(
     r"(?:만원|억원|원|명|개|번|배|살|세|년|개월|달|주|일|시간|분|초|%|퍼센트|순위|위|등급|등|평|층|점|가지|단계|회|건|곳)?"
 )
 KNUM_HL = re.compile(r"(?:한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|스무)\s?(?:가지|배|번|개|명|달|해|살|군데|곳|단계)")
-RESULT_WORDS = ("당첨", "합격", "성공", "무료", "공짜", "절약", "손해", "이득", "대박", "꿀팁", "비밀", "주의", "금지", "필수", "최대", "최소", "정답", "결과", "무조건", "반드시", "절대")
+RESULT_WORDS = ("당첨", "합격", "성공", "무료", "공짜", "절약", "손해", "이득", "대박", "꿀팁", "비밀", "주의", "금지", "필수", "정답", "결과", "무조건", "반드시", "절대")
+# 앞말에 붙어야 뜻이 통하는 말 (앞에서 끊지 않는다): '깨는 / 대신' ✗
+DEPENDENT = ("대신", "때", "것", "수", "줄", "만큼", "동안", "정도", "이상", "이하", "중", "후", "뒤", "덕분", "때문")
 
 
 def display(text: str) -> str:
     """화면용: 마침표·쉼표·말줄임 제거 (물음표·느낌표는 남김)."""
     text = re.sub(r"(\.{2,}|…)", " ", text)
-    text = re.sub(r"[.,。、]", "", text)
+    text = re.sub(r"(?<!\d)[.,]|[.,](?!\d)|[。、]", "", text)  # 9.5억·2,574만의 점·쉼표는 남긴다
     return re.sub(r"\s+", " ", text).strip()
 
 
@@ -44,6 +46,11 @@ def chunk(tokens: list, max_chars: int = 12) -> list:
         cost = 0.0 if raw.endswith((",", "?", "!", ".")) or GOOD_BREAK.search(norm(raw) or raw) else 1.2
         if re.search(r"\d[\d,.]*(천|만|억|백|십)*$", tokens[i][1]) and UNIT_START.match(tokens[i + 1][1]):
             cost += 4.0  # 숫자와 단위 사이는 끊지 않는다
+        nxt = norm(tokens[i + 1][1])
+        if nxt.startswith(DEPENDENT) or nxt in ("새", "만에"):
+            cost += 2.5
+        if re.match(r"\d", tokens[i + 1][1]) and not raw.endswith((",", ".", "?", "!")):
+            cost += 2.0  # 숫자 바로 앞에서 끊지 않는다: 월 2만 원, 분양가 9.5억, 최대 120만 원
         return cost
 
     best = [0.0] + [float("inf")] * n
@@ -51,9 +58,10 @@ def chunk(tokens: list, max_chars: int = 12) -> list:
     for i in range(1, n + 1):
         for j in range(i - 1, -1, -1):
             length = sum(lens[j:i])
-            if length > max_chars and i - j > 1:
+            if length > max_chars + 2 and i - j > 1:  # 12자는 기준, 의미 단위를 지키려면 2자까지 넘칠 수 있다
                 break
             cost = best[j] + 0.5 + 0.06 * (length - target) ** 2 + break_cost(i - 1)
+            cost += 0.8 * max(0, length - max_chars)
             # 쉼표·문장 끝을 줄 가운데에 끼우지 않는다 (의미 단위가 섞임)
             cost += 1.0 * sum(1 for k in range(j, i - 1) if tokens[k][0].rstrip().endswith((",", ".", "?", "!")))
             if length <= 2 and n > 1:

@@ -114,7 +114,7 @@ def from_tts(spec: dict, engine: str | None = None, voice: str | None = None, lo
             sent = scene_text[sa:sb].strip()
             if not norm(sent):
                 continue
-            clip = tts.speak(sent, engine, voice)
+            clip = tts.speak(tts.readable(sent), engine, voice)
             env = Envelope.from_samples(clip)
             toks = [(w, a + sa + s0 + (len(scene_text[sa:sb]) - len(scene_text[sa:sb].lstrip())), 0) for w, s0, _ in _tokens(sent)]
             spans = env.spans() or [(0.0, clip.size / SR)]

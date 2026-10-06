@@ -1,0 +1,141 @@
+# 오늘의 청약 사이트: 하루 두 번 공공데이터를 수집하고 GitHub Pages에 다시 배포한다.
+# 설정 방법은 cheongyak/README.md 참고.
+name: 오늘의 청약 사이트
+
+on:
+  schedule:
+    - cron: "17 21 * * *" # 매일 06:17 (한국 시간)
+    - cron: "17 9 * * *" # 매일 18:17 (한국 시간)
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - "cheongyak/**"
+      - ".github/workflows/cheongyak-site.yml"
+
+permissions:
+  contents: write # 수집 데이터를 cheongyak-data 브랜치에 저장
+  pages: write
+  id-token: write
+
+concurrency:
+  group: cheongyak-site
+  cancel-in-progress: false
+
+env:
+  GIT_AUTHOR_NAME: github-actions[bot]
+  GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+  GIT_COMMITTER_NAME: github-actions[bot]
+  GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+
+jobs:
+  build:
+    name: 수집·빌드
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: cheongyak
+    outputs:
+      base_url: ${{ steps.pages.outputs.base_url }}
+      update: ${{ steps.update.outcome }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: cheongyak/requirements*.txt
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: 테스트
+        run: |
+          python -m pytest -q
+          node --test tests/calc.test.js
+
+      - name: 저장된 데이터 불러오기
+        run: bash scripts/data-branch.sh restore
+
+      # 실패해도 기존 데이터로 사이트는 계속 배포한다 (D-day·상태는 매일 바뀌므로). 실패 여부는 마지막 작업에서 알린다.
+      - name: 청약 공고 수집 (공공데이터포털)
+        id: update
+        continue-on-error: true
+        env:
+          DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}
+        run: python -m app update
+
+      - name: 데이터 저장
+        if: steps.update.outcome == 'success'
+        run: bash scripts/data-branch.sh save
+
+      - name: Pages 설정 확인
+        id: pages
+        uses: actions/configure-pages@v6
+
+      - name: 사이트 빌드
+        run: python -m app build --base-url "${{ steps.pages.outputs.base_url }}"
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: cheongyak/dist
+
+      - name: 알림용 데이터 보관
+        if: steps.update.outcome == 'success'
+        uses: actions/upload-artifact@v6
+        with:
+          name: notify
+          path: |
+            cheongyak/tmp/new_ids.json
+            cheongyak/data/notices.json
+          retention-days: 2
+
+  deploy:
+    name: 배포
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
+
+  finish:
+    name: 알림·결과 확인
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cheongyak
+    steps:
+      - name: 수집 결과 확인
+        if: needs.build.outputs.update != 'success'
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "::error title=청약 공고 수집 실패::'수집·빌드' 작업의 '청약 공고 수집' 단계 로그를 확인하세요. 사이트는 기존 데이터로 배포됐습니다."
+          exit 1
+
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: cheongyak/requirements*.txt
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: notify
+          path: cheongyak
+
+      - name: 텔레그램 알림 (설정한 경우만)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m app notify --base-url "${{ needs.build.outputs.base_url }}"

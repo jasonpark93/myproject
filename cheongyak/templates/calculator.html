@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}청약 가점 계산기 (84점 만점, 배우자 통장 합산 반영) | {{ site.site_name }}{% endblock %}
+{% block description %}무주택기간, 부양가족 수, 청약통장 가입기간으로 내 청약 가점을 바로 계산합니다. 2024년 3월부터 바뀐 배우자 청약통장 가입기간 합산(최대 3점)까지 반영했습니다.{% endblock %}
+{% block content %}
+<section class="hero hero-sm">
+  <h1>청약 가점 계산기</h1>
+  <p class="lead">민영주택 일반공급 가점제 기준으로 84점 만점 점수를 계산합니다. 입력한 내용은 이 브라우저 안에서만 계산되고 어디에도 저장되지 않습니다.</p>
+</section>
+
+<form class="calc" id="calc" novalidate>
+  <fieldset>
+    <legend>1. 무주택기간 <small>최대 32점</small></legend>
+    <label for="homeless">세대원 전원이 무주택인 기간</label>
+    <select id="homeless" name="h">
+      <option value="-1">유주택자이거나 만 30세 미만 미혼 (0점)</option>
+      <option value="0">1년 미만 (2점)</option>
+      {% for y in range(1, 15) %}<option value="{{ y }}">{{ y }}년 이상 ~ {{ y + 1 }}년 미만 ({{ 2 * (y + 1) }}점)</option>
+      {% endfor %}<option value="15">15년 이상 (32점)</option>
+    </select>
+    <details class="helper">
+      <summary>무주택기간을 날짜로 계산하기</summary>
+      <p class="note">무주택기간은 만 30세가 된 날부터 계산하고, 그 전에 혼인했다면 혼인신고일부터 계산합니다. 집을 팔았다면 처분한 날부터 다시 셉니다.</p>
+      <div class="grid2">
+        <label>생년월일<input type="date" id="birth"></label>
+        <label>혼인신고일 <small>(선택)</small><input type="date" id="marriage"></label>
+        <label>마지막 주택 처분일 <small>(선택)</small><input type="date" id="disposal"></label>
+        <label>기준일 <small>(입주자모집공고일)</small><input type="date" id="refdate"></label>
+      </div>
+      <button type="button" class="btn" id="homeless-apply">계산해서 반영</button>
+      <p class="note" id="homeless-result" aria-live="polite"></p>
+    </details>
+  </fieldset>
+
+  <fieldset>
+    <legend>2. 부양가족 수 <small>최대 35점</small></legend>
+    <label for="dependents">본인을 뺀 부양가족 수</label>
+    <select id="dependents" name="d">
+      {% for n in range(0, 7) %}<option value="{{ n }}">{{ n }}명{% if n == 6 %} 이상{% endif %} ({{ 5 + 5 * n }}점)</option>
+      {% endfor %}
+    </select>
+    <p class="note">배우자, 3년 이상 같은 주민등록등본에 있는 부모·조부모, 미혼 자녀 등이 해당합니다. 세부 인정 기준은 모집공고문을 확인하세요.</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>3. 청약통장 가입기간 <small>최대 17점</small></legend>
+    <label for="account">본인 청약통장 가입기간</label>
+    <select id="account" name="a">
+      <option value="0">6개월 미만 (1점)</option>
+      <option value="6">6개월 이상 ~ 1년 미만 (2점)</option>
+      {% for y in range(1, 15) %}<option value="{{ y * 12 }}">{{ y }}년 이상 ~ {{ y + 1 }}년 미만 ({{ y + 2 }}점)</option>
+      {% endfor %}<option value="180">15년 이상 (17점)</option>
+    </select>
+    <label for="spouse">배우자 청약통장 가입기간 <small>(2024.3.25 이후 공고, 가입기간 점수의 50%·최대 3점)</small></label>
+    <select id="spouse" name="s">
+      <option value="-1">배우자 없음 또는 통장 없음 (0점)</option>
+      <option value="0">1년 미만 (1점)</option>
+      <option value="12">1년 이상 ~ 2년 미만 (2점)</option>
+      <option value="24">2년 이상 (3점)</option>
+    </select>
+    <p class="note">본인과 배우자 점수를 합쳐도 통장 가입기간 점수는 최대 17점입니다.</p>
+  </fieldset>
+</form>
+
+<section class="calc-result" aria-live="polite">
+  <p class="eyebrow">내 청약 가점</p>
+  <p class="total"><strong id="total">-</strong><span> / 84점</span></p>
+  <div class="meter" aria-hidden="true"><span id="meter"></span></div>
+  <dl class="breakdown">
+    <dt>무주택기간</dt><dd id="r-homeless">-</dd>
+    <dt>부양가족</dt><dd id="r-dependents">-</dd>
+    <dt>청약통장</dt><dd id="r-account">-</dd>
+  </dl>
+  <button type="button" class="btn" id="share">결과 링크 복사</button>
+  <p class="note" id="share-msg" aria-live="polite"></p>
+</section>
+
+{{ ad('in_article') }}
+
+<section class="block prose">
+  <h2>청약 가점 점수표</h2>
+  <p>가점제는 무주택기간(32점), 부양가족 수(35점), 청약통장 가입기간(17점)을 더해 84점 만점으로 계산합니다. 같은 주택형에 신청한 사람 중 점수가 높은 순서로 당첨자를 정하고, 동점이면 추첨합니다.</p>
+  <div class="table-wrap">
+    <table class="compact score-table">
+      <thead><tr><th scope="col">항목</th><th scope="col">점수 기준</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">무주택기간</th><td>1년 미만 2점, 이후 1년마다 2점씩 늘어 15년 이상 32점. 유주택자·만 30세 미만 미혼은 0점</td></tr>
+        <tr><th scope="row">부양가족 수</th><td>0명 5점, 1명당 5점씩 늘어 6명 이상 35점</td></tr>
+        <tr><th scope="row">청약통장 가입기간</th><td>6개월 미만 1점, 6개월~1년 2점, 1년 이상부터 1년마다 1점씩 늘어 15년 이상 17점</td></tr>
+        <tr><th scope="row">배우자 통장</th><td>1년 미만 1점, 1~2년 2점, 2년 이상 3점을 본인 점수에 더함 (합계 최대 17점)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">이 계산기는 참고용입니다. 실제 청약 자격과 가점은 청약홈의 '청약자격 확인'과 모집공고문 기준으로 판단됩니다.</p>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ asset('calc.js') }}" defer></script>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}페이지를 찾을 수 없습니다 | {{ site.site_name }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="hero hero-sm">
+  <h1>페이지를 찾을 수 없습니다</h1>
+  <p class="lead">주소가 바뀌었거나 삭제된 페이지입니다.</p>
+  <p><a class="btn btn-primary" href="{{ url('/') }}">오늘의 청약 일정 보기</a> <a class="btn" href="{{ url('/region/') }}">지역별로 찾기</a></p>
+</section>
+{% endblock %}

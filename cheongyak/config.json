@@ -1,0 +1,21 @@
+{
+  "site_name": "오늘의 청약",
+  "tagline": "전국 아파트 청약 일정·분양가를 매일 자동으로 정리합니다",
+  "base_url": "https://jasonpark93.github.io/myproject",
+  "contact_email": "",
+
+  "adsense_client": "",
+  "adsense_slots": {
+    "top": "",
+    "in_article": ""
+  },
+  "ga4_measurement_id": "",
+  "google_site_verification": "",
+  "naver_site_verification": "",
+  "telegram_channel_url": "",
+
+  "kinds": ["apt", "remndr", "urbty"],
+  "backfill_days": 365,
+  "refresh_days": 45,
+  "max_model_calls_per_run": 300
+}

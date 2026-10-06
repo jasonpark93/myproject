@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ region.name }} 아파트 청약 일정 {{ year }} | {{ site.site_name }}{% endblock %}
+{% block description %}{{ region.name }} 지역 아파트·무순위·오피스텔 청약 일정과 분양가. 진행 중 {{ active|length }}건, 지난 공고 {{ closed|length }}건을 매일 자동으로 정리합니다.{% endblock %}
+{% block content %}
+<nav class="breadcrumb" aria-label="현재 위치">
+  <a href="{{ url('/') }}">홈</a><span aria-hidden="true">›</span>
+  <a href="{{ url('/region/') }}">지역별 청약</a><span aria-hidden="true">›</span>
+  <span>{{ region.name }}</span>
+</nav>
+<section class="hero hero-sm">
+  <h1>{{ region.name }} 청약 일정</h1>
+  <p class="lead">{{ today_full }} 기준 {{ region.name }} 지역에서 접수 중이거나 예정된 청약은 {{ active|length }}건입니다.</p>
+</section>
+
+{{ ad('top') }}
+
+<section class="list-section">
+  <h2>진행 중·예정 <small>{{ active|length }}건</small></h2>
+  {% if active %}
+  <div class="cards">
+    {% for n in active %}{% include "_card.html" %}{% endfor %}
+  </div>
+  {% else %}
+  <p class="empty">지금은 {{ region.name }} 지역에 진행 중인 청약이 없습니다. 새 공고가 올라오면 자동으로 추가됩니다.</p>
+  {% endif %}
+</section>
+
+{% if closed %}
+<section class="list-section">
+  <h2>지난 공고 <small>{{ closed|length }}건</small></h2>
+  <div class="table-wrap">
+    <table class="compact">
+      <thead><tr><th scope="col">단지명</th><th scope="col">구분</th><th scope="col">접수일</th><th scope="col">세대수</th></tr></thead>
+      <tbody>
+        {% for n in closed %}
+        <tr>
+          <th scope="row"><a href="{{ url(n.path) }}">{{ n.name }}</a></th>
+          <td>{{ n.kind_label }}</td>
+          <td>{{ (n.apply_start or n.announce_date)|md }}</td>
+          <td>{{ n.total_units|comma or '-' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<p class="other-regions">다른 지역:
+  {% for r in region_list if r.slug != region.slug %}<a href="{{ url(r.path) }}">{{ r.name }}</a>{% endfor %}
+</p>
+{% endblock %}

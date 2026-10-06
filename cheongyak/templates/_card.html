@@ -1,0 +1,15 @@
+<article class="card status-{{ n.status }}" data-region="{{ n.region_slug }}">
+  <div class="card-top">
+    <span class="badge badge-{{ n.status }}" data-status-badge>{{ n.status_label }}</span>
+    {% if n.dday %}<span class="dday" data-dday data-start="{{ n.apply_start or '' }}" data-end="{{ n.apply_end or '' }}" data-winner="{{ n.winner_date or '' }}" data-contract-end="{{ n.contract_end or '' }}">{{ n.dday }}</span>{% endif %}
+    <span class="kind">{{ n.kind_label }}</span>
+  </div>
+  <h3 class="card-title"><a href="{{ url(n.path) }}">{{ n.name }}</a></h3>
+  <p class="card-meta">{{ n.region }}{% if n.total_units %} · 총 {{ n.total_units|comma }}세대{% endif %}{% if n.supply_type %} · {{ n.supply_type }}{% endif %}</p>
+  {% if n.key_dates %}
+  <ul class="mini-schedule">
+    {% for k in n.key_dates %}<li><span>{{ k.label }}</span>{{ k.text }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  {% if n.price_short %}<p class="card-price">최고 <strong>{{ n.price_short }}</strong></p>{% endif %}
+</article>

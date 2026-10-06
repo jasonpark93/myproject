@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}지역별 아파트 청약 일정 | {{ site.site_name }}{% endblock %}
+{% block description %}서울, 경기, 인천, 부산 등 지역별 아파트 청약 일정과 분양 공고를 모아 봤습니다.{% endblock %}
+{% block content %}
+<section class="hero hero-sm">
+  <h1>지역별 청약 일정</h1>
+  <p class="lead">관심 지역을 고르면 진행 중인 청약과 지난 공고를 모두 볼 수 있습니다.</p>
+</section>
+{% if region_list %}
+<ul class="region-grid">
+  {% for r in region_list %}
+  <li><a href="{{ url(r.path) }}"><strong>{{ r.name }}</strong><span>진행 중 {{ r.active_count }}건 · 전체 {{ r.notices|length }}건</span></a></li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">아직 수집된 공고가 없습니다.</p>
+{% endif %}
+{% endblock %}

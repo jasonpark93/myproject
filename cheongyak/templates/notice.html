@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}{{ n.name }} 청약 일정·분양가 ({{ n.region }}) | {{ site.site_name }}{% endblock %}
+{% block description %}{{ n.meta_description }}{% endblock %}
+{% block content %}
+<nav class="breadcrumb" aria-label="현재 위치">
+  <a href="{{ url('/') }}">홈</a><span aria-hidden="true">›</span>
+  <a href="{{ url('/region/' ~ n.region_slug ~ '/') }}">{{ n.region }}</a><span aria-hidden="true">›</span>
+  <span>{{ n.name }}</span>
+</nav>
+
+<article class="notice">
+  <header class="notice-head">
+    <div class="card-top">
+      <span class="badge badge-{{ n.status }}" data-status-badge>{{ n.status_label }}</span>
+      {% if n.dday %}<span class="dday" data-dday data-start="{{ n.apply_start or '' }}" data-end="{{ n.apply_end or '' }}" data-winner="{{ n.winner_date or '' }}" data-contract-end="{{ n.contract_end or '' }}">{{ n.dday }}</span>{% endif %}
+      <span class="kind">{{ n.kind_label }}</span>
+    </div>
+    <h1>{{ n.name }} 청약 일정·분양가</h1>
+    <p class="notice-meta">
+      {{ n.region }}{% if n.total_units %} · 총 {{ n.total_units|comma }}세대{% endif %}
+      {% if n.supply_type %} · {{ n.supply_type }}{% endif %}{% if n.rent_type %} · {{ n.rent_type }}{% endif %}
+      {% if n.announce_text %} · 모집공고 {{ n.announce_text }}{% endif %}
+    </p>
+    {% if n.active_flags %}
+    <ul class="flag-chips">{% for f in n.active_flags %}<li>{{ f }}</li>{% endfor %}</ul>
+    {% endif %}
+  </header>
+
+  <p class="summary">{{ n.summary }}</p>
+
+  {% if n.schedule_view %}
+  <section class="block">
+    <div class="block-head">
+      <h2>청약 일정</h2>
+      <a class="btn" href="{{ url(n.path ~ 'calendar.ics') }}" download>캘린더에 추가</a>
+    </div>
+    <ol class="timeline">
+      {% for s in n.schedule_view %}
+      <li class="step step-{{ s.state }}">
+        <span class="step-label">{{ s.label }}</span>
+        <span class="step-date">{{ s.text }}</span>
+        {% if s.state == 'now' %}<span class="step-pill">진행 중</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="note">1순위·2순위 접수는 지역 구분에 따라 날짜가 다를 수 있습니다. 청약 신청은 청약홈 또는 은행 앱에서 할 수 있습니다.</p>
+  </section>
+  {% endif %}
+
+  {{ ad('in_article') }}
+
+  {% if n.models_view %}
+  <section class="block">
+    <h2>주택형별 분양가·공급 세대</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">주택형</th><th scope="col">공급면적</th><th scope="col">일반공급</th><th scope="col">특별공급</th><th scope="col">최고 분양가</th><th scope="col">평당가</th></tr>
+        </thead>
+        <tbody>
+          {% for m in n.models_view %}
+          <tr>
+            <th scope="row">{{ m.type or '-' }}</th>
+            <td>{% if m.supply_area %}{{ '%.2f'|format(m.supply_area) }}㎡<small> (약 {{ m.pyeong }}평)</small>{% else %}-{% endif %}</td>
+            <td>{{ m.units_general|comma or '-' }}</td>
+            <td>{{ m.units_special|comma or '-' }}</td>
+            <td>{{ m.price_text or '-' }}</td>
+            <td>{{ m.per_pyeong_text or '-' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="note">주택형 숫자는 전용면적(㎡)입니다. 최고 분양가는 같은 주택형 안에서 층·동에 따라 가장 높은 금액이며, 평당가는 공급면적 기준으로 계산한 참고값입니다.</p>
+  </section>
+  {% endif %}
+
+  {% if n.special_totals %}
+  <section class="block">
+    <h2>특별공급 유형별 세대수</h2>
+    <ul class="special-list">
+      {% for label, count in n.special_totals.items() %}<li><span>{{ label }}</span><strong>{{ count|comma }}세대</strong></li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <section class="block">
+    <h2>단지 정보</h2>
+    <dl class="facts">
+      {% if n.address %}<dt>공급 위치</dt><dd>{{ n.address }}
+        <a class="inline-link" href="https://map.naver.com/p/search/{{ n.address|urlencode }}" rel="noopener nofollow" target="_blank">지도</a></dd>{% endif %}
+      {% if n.house_type %}<dt>주택 구분</dt><dd>{{ n.house_type }}{% if n.supply_type %} ({{ n.supply_type }}){% endif %}</dd>{% endif %}
+      {% if n.total_units %}<dt>공급 규모</dt><dd>{{ n.total_units|comma }}세대</dd>{% endif %}
+      {% if n.developer %}<dt>시행사</dt><dd>{{ n.developer }}</dd>{% endif %}
+      {% if n.builder %}<dt>시공사</dt><dd>{{ n.builder }}</dd>{% endif %}
+      {% if n.move_in_text %}<dt>입주 예정</dt><dd>{{ n.move_in_text }}</dd>{% endif %}
+      {% if n.phone %}<dt>문의처</dt><dd>{{ n.phone }}</dd>{% endif %}
+      {% if n.homepage %}<dt>분양 홈페이지</dt><dd><a href="{{ n.homepage }}" rel="noopener nofollow" target="_blank">{{ n.homepage }}</a></dd>{% endif %}
+    </dl>
+  </section>
+
+  {% if n.flags %}
+  <section class="block">
+    <h2>규제 지역·사업 구분</h2>
+    <ul class="flag-list">
+      {% for label, on in n.flags.items() %}
+      <li class="{{ 'on' if on else 'off' }}">
+        <strong>{{ label }}</strong> <span class="yn">{{ '해당' if on else '해당 없음' }}</span>
+        {% if on and flag_help.get(label) %}<p>{{ flag_help[label] }}</p>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="note">규제 내용(재당첨 제한, 전매제한, 거주의무 기간 등)은 공고마다 다르므로 모집공고문에서 확인하세요.</p>
+  </section>
+  {% endif %}
+
+  <div class="actions">
+    {% if n.notice_url %}<a class="btn btn-primary" href="{{ n.notice_url }}" rel="noopener nofollow" target="_blank">청약홈 모집공고 원문 보기</a>{% endif %}
+    <a class="btn" href="{{ url('/calculator/') }}">내 청약 가점 계산하기</a>
+  </div>
+</article>
+
+{% if related %}
+<section class="list-section">
+  <h2>{{ n.region }}의 다른 청약</h2>
+  <div class="cards">
+    {% for n in related %}{% include "_card.html" %}{% endfor %}
+  </div>
+  <p><a href="{{ url('/region/' ~ related[0].region_slug ~ '/') }}">{{ related[0].region }} 청약 전체 보기 →</a></p>
+</section>
+{% endif %}
+{% endblock %}

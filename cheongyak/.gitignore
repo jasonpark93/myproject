@@ -1,0 +1,8 @@
+dist/
+dist-demo/
+tmp/
+__pycache__/
+.pytest_cache/
+*.pyc
+data/notices.json
+data/*.tmp

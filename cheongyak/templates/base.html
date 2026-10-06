@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ site.site_name }}{% endblock %}</title>
+<meta name="description" content="{% block description %}{{ site.tagline }}{% endblock %}">
+<link rel="canonical" href="{{ canonical }}">
+{% if demo %}
+<meta name="robots" content="noindex, nofollow">
+{% endif %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ site.site_name }}">
+<meta property="og:title" content="{{ self.title() }}">
+<meta property="og:description" content="{{ self.description() }}">
+<meta property="og:url" content="{{ canonical }}">
+<meta property="og:locale" content="ko_KR">
+<meta name="theme-color" content="#1d4ed8">
+{% if site.google_site_verification %}
+<meta name="google-site-verification" content="{{ site.google_site_verification }}">
+{% endif %}
+{% if site.naver_site_verification %}
+<meta name="naver-site-verification" content="{{ site.naver_site_verification }}">
+{% endif %}
+<link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="{{ site.site_name }} 새 청약 공고" href="{{ url('/feed.xml') }}">
+<link rel="stylesheet" href="{{ asset('style.css') }}">
+{% if site.adsense_client and not demo %}
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site.adsense_client }}" crossorigin="anonymous"></script>
+{% endif %}
+{% if site.ga4_measurement_id and not demo %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.ga4_measurement_id }}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ site.ga4_measurement_id }}');</script>
+{% endif %}
+{% block head %}{% endblock %}
+</head>
+<body>
+<a class="skip" href="#main">본문 바로가기</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="{{ url('/') }}">
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 3 2 11h3v9h5v-6h4v6h5v-9h3z"/></svg>
+      <span>{{ site.site_name }}</span>
+    </a>
+    <nav class="main-nav" aria-label="주요 메뉴">
+      <a href="{{ url('/') }}"{% if path == '/' %} aria-current="page"{% endif %}>청약 일정</a>
+      <a href="{{ url('/region/') }}"{% if path.startswith('/region/') %} aria-current="page"{% endif %}>지역별</a>
+      <a href="{{ url('/calculator/') }}"{% if path == '/calculator/' %} aria-current="page"{% endif %}>가점 계산기</a>
+      <a href="{{ url('/guide/') }}"{% if path == '/guide/' %} aria-current="page"{% endif %}>청약 가이드</a>
+    </nav>
+  </div>
+</header>
+{% if demo %}
+<div class="demo-banner">샘플 데이터로 만든 미리보기입니다. 실제 청약 정보가 아닙니다.</div>
+{% endif %}
+<main id="main" class="container">
+{% block content %}{% endblock %}
+</main>
+<footer class="site-footer">
+  <div class="container">
+    <p><strong>{{ site.site_name }}</strong> · {{ site.tagline }}</p>
+    <p class="muted">자료 출처: 한국부동산원 청약홈 분양정보(공공데이터포털 Open API){% if updated_text %} · 마지막 수집 {{ updated_text }}{% endif %}.
+      공고 내용은 정정될 수 있으니 청약 전 반드시 청약홈의 모집공고문 원문을 확인하세요.</p>
+    <p class="footer-links">
+      <a href="{{ url('/about/') }}">사이트 소개</a>
+      <a href="{{ url('/privacy/') }}">개인정보처리방침</a>
+      <a href="{{ url('/feed.xml') }}">RSS</a>
+      <a href="{{ webcal }}">캘린더 구독</a>
+      {% if site.telegram_channel_url %}<a href="{{ site.telegram_channel_url }}" rel="noopener">텔레그램 알림</a>{% endif %}
+    </p>
+    <p class="muted">© {{ year }} {{ site.site_name }}</p>
+  </div>
+</footer>
+<script src="{{ asset('app.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+{{ jsonld if jsonld }}
+</body>
+</html>

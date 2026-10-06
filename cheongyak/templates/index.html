@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ site.site_name }} - 전국 아파트 청약 일정·분양가 한눈에 보기{% endblock %}
+{% block description %}{{ today_full }} 기준 접수 중인 청약 {{ counts.open }}건, 접수 예정 {{ counts.upcoming }}건. 전국 아파트·무순위(줍줍)·오피스텔 청약 일정과 주택형별 분양가를 매일 자동으로 정리합니다.{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">{{ today_full }} 기준</p>
+  <h1>오늘의 청약 일정</h1>
+  <p class="lead">{{ site.tagline }}. 아파트 분양, 무순위·잔여세대(줍줍), 오피스텔 공고를 한곳에서 확인하세요.</p>
+  <div class="stats">
+    <a class="stat stat-open" href="#open"><strong>{{ counts.open }}</strong><span>접수 중</span></a>
+    <a class="stat stat-upcoming" href="#upcoming"><strong>{{ counts.upcoming }}</strong><span>접수 예정</span></a>
+    <a class="stat stat-winner" href="#winner"><strong>{{ counts.winner_wait + counts.contract }}</strong><span>발표·계약</span></a>
+  </div>
+</section>
+
+{% if region_list %}
+<nav class="chips" aria-label="지역으로 거르기" data-region-filter>
+  <button type="button" class="chip" aria-pressed="true" data-region="">전체</button>
+  {% for r in region_list %}
+  <button type="button" class="chip" aria-pressed="false" data-region="{{ r.slug }}">{{ r.name }}{% if r.active_count %} <small>{{ r.active_count }}</small>{% endif %}</button>
+  {% endfor %}
+</nav>
+{% endif %}
+
+{{ ad('top') }}
+
+{% for sec in sections %}
+<section id="{{ sec.id }}" class="list-section" data-section>
+  <h2>{{ sec.title }} <small>{{ sec.notices|length }}건</small></h2>
+  {% if sec.notices %}
+  <div class="cards">
+    {% for n in sec.notices %}{% include "_card.html" %}{% endfor %}
+  </div>
+  <p class="empty" data-empty hidden>선택한 지역의 공고가 없습니다.</p>
+  {% else %}
+  <p class="empty">{{ sec.empty }}</p>
+  {% endif %}
+</section>
+{% endfor %}
+
+<section class="cta-grid" aria-label="더 보기">
+  <a class="cta" href="{{ url('/calculator/') }}">
+    <strong>내 청약 가점은 몇 점?</strong>
+    <span>무주택기간·부양가족·통장 가입기간으로 84점 만점 가점을 바로 계산해 보세요.</span>
+  </a>
+  <a class="cta" href="{{ webcal }}">
+    <strong>청약 일정 캘린더 구독</strong>
+    <span>휴대폰 캘린더에 전국 청약 일정이 자동으로 들어옵니다.</span>
+  </a>
+  {% if site.telegram_channel_url %}
+  <a class="cta" href="{{ site.telegram_channel_url }}" rel="noopener">
+    <strong>새 공고 텔레그램 알림</strong>
+    <span>새 청약 공고가 올라오면 바로 알려드립니다.</span>
+  </a>
+  {% else %}
+  <a class="cta" href="{{ url('/guide/') }}">
+    <strong>처음이라면 청약 가이드</strong>
+    <span>특별공급, 1순위, 가점제와 추첨제를 쉽게 정리했습니다.</span>
+  </a>
+  {% endif %}
+</section>
+{% endblock %}
